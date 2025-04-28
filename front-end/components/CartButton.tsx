@@ -1,18 +1,18 @@
 import { TouchableOpacity } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
 
-const SearchButton = ({
+const CartButton = ({
   onPress,
-  color,
+  color = "black",
 }: {
   onPress: () => void;
   color?: string;
 }) => {
   return (
     <TouchableOpacity onPress={onPress}>
-      <Feather name="search" size={24} color={color} />
+      <Feather name="shopping-cart" size={24} color={color} />
     </TouchableOpacity>
   );
 };
 
-export default SearchButton;
+export default CartButton;

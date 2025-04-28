@@ -4,14 +4,17 @@ import { Text, Image, StyleSheet, TouchableOpacity, View } from "react-native";
 const MenuCard = ({
   menu,
   filter,
+  onPress,
 }: {
   menu: { name: string; price: number; image: string };
   filter: number;
+  onPress: () => void;
 }) => {
   if (filter === 3) {
     return (
       <TouchableOpacity
         style={[styles.container, { flexBasis: `${100 / filter}%` }]}
+        onPress={onPress}
       >
         <Image source={{ uri: menu.image }} style={styles.menuImage} />
         <Text style={styles.name}>{menu.name}</Text>
@@ -26,6 +29,7 @@ const MenuCard = ({
         styles.container,
         { flexBasis: `${100 / filter}%`, flexDirection: "row", gap: 30 },
       ]}
+      onPress={onPress}
     >
       <Image source={{ uri: menu.image }} style={styles.menuImage} />
       <View style={{ flex: 1, gap: 10 }}>

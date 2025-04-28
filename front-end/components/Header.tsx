@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Entypo from "@expo/vector-icons/Entypo";
 
 interface HeaderProps {
-  title: string;
+  title?: string;
   showBackButton?: boolean;
   rightNode?: React.ReactNode;
   borderBottomWidth?: number;
@@ -68,9 +68,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     justifyContent: "center",
   },
-  backButton: {
-    padding: 8,
-  },
+  backButton: {},
   backButtonText: {
     fontSize: 24,
     color: "#8B4513",

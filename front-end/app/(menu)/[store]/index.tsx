@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import HeaderOptions from "@/components/HeaderOptions";
 import Feather from "@expo/vector-icons/Feather";
-import MenuCard from "./MenuCard";
+import MenuCard from "../MenuCard";
 
 export default function StoreMenu() {
   const { store } = useLocalSearchParams<{ store: string }>();
@@ -12,22 +12,44 @@ export default function StoreMenu() {
 
   const menuList = [
     {
+      id: 1,
       name: "라떼",
+      category: "coffee",
       price: 5000,
       image: "https://picsum.photos/200/300",
     },
     {
+      id: 2,
       name: "초코라떼",
+      category: "coffee",
       price: 5000,
       image: "https://picsum.photos/200/300",
     },
     {
+      id: 3,
       name: "아이스아메리카노",
+      category: "coffee",
       price: 5000,
       image: "https://picsum.photos/200/300",
     },
     {
+      id: 4,
       name: "핫아메리카노",
+      category: "coffee",
+      price: 5000,
+      image: "https://picsum.photos/200/300",
+    },
+    {
+      id: 5,
+      name: "아이스초코라떼",
+      category: "coffee",
+      price: 5000,
+      image: "https://picsum.photos/200/300",
+    },
+    {
+      id: 6,
+      name: "헛개리카노",
+      category: "coffee",
       price: 5000,
       image: "https://picsum.photos/200/300",
     },
@@ -66,6 +88,9 @@ export default function StoreMenu() {
               key={menu.name}
               menu={menu}
               filter={filter === 1 ? 3 : 1}
+              onPress={() => {
+                router.push(`/(menu)/${store}/${menu.id}`);
+              }}
             />
           ))}
         </View>
