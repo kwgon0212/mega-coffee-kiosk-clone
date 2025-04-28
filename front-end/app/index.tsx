@@ -1,18 +1,57 @@
+import Button from "@/components/Button";
+import { router } from "expo-router";
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
-import { Link } from "expo-router";
+import { View, Text, StyleSheet, Image } from "react-native";
 
-export default function LandingPage() {
+const LandingPage = () => {
   return (
-    <View className="flex flex-1 items-center justify-center bg-black">
-      <Text className="text-2xl font-bold mb-8 text-red-300">
-        키오스크 주문 시스템 dd
-      </Text>
-      <Link href="/menu" asChild>
-        <TouchableOpacity className="bg-blue-500 px-6 py-3 rounded-lg">
-          <Text className="text-white font-bold">주문하기</Text>
-        </TouchableOpacity>
-      </Link>
+    <View style={styles.container}>
+      <View style={styles.logoContainer}>
+        <Image
+          source={require("@/assets/images/mega-logo.png")}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </View>
+      <View style={styles.buttonContainer}>
+        <Button text="test" onPress={() => {}} />
+        <Button text="test" onPress={() => {}} />
+        <Button
+          text="로그인 / 회원가입"
+          onPress={() => {
+            router.push("/(auth)");
+          }}
+        />
+      </View>
     </View>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 50,
+    paddingHorizontal: 16,
+    backgroundColor: "white",
+  },
+  logo: {
+    width: 200,
+    height: 200,
+    marginBottom: 32,
+  },
+  logoContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+  },
+  buttonContainer: {
+    flexDirection: "column",
+    width: "100%",
+    maxWidth: 500,
+    gap: 16,
+  },
+});
+
+export default LandingPage;
