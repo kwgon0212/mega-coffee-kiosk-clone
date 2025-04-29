@@ -1,59 +1,15 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import HeaderOptions from "@/components/HeaderOptions";
 import Feather from "@expo/vector-icons/Feather";
 import MenuCard from "../MenuCard";
+import menuList from "@/assets/mock/menuList";
 
 export default function StoreMenu() {
   const { store } = useLocalSearchParams<{ store: string }>();
   const [selectedOption, setSelectedOption] = useState("new");
   const [filter, setFilter] = useState(1);
-
-  const menuList = [
-    {
-      id: 1,
-      name: "라떼",
-      category: "coffee",
-      price: 5000,
-      image: "https://picsum.photos/200/300",
-    },
-    {
-      id: 2,
-      name: "초코라떼",
-      category: "coffee",
-      price: 5000,
-      image: "https://picsum.photos/200/300",
-    },
-    {
-      id: 3,
-      name: "아이스아메리카노",
-      category: "coffee",
-      price: 5000,
-      image: "https://picsum.photos/200/300",
-    },
-    {
-      id: 4,
-      name: "핫아메리카노",
-      category: "coffee",
-      price: 5000,
-      image: "https://picsum.photos/200/300",
-    },
-    {
-      id: 5,
-      name: "아이스초코라떼",
-      category: "coffee",
-      price: 5000,
-      image: "https://picsum.photos/200/300",
-    },
-    {
-      id: 6,
-      name: "헛개리카노",
-      category: "coffee",
-      price: 5000,
-      image: "https://picsum.photos/200/300",
-    },
-  ];
 
   return (
     <View style={styles.container}>
@@ -74,25 +30,34 @@ export default function StoreMenu() {
 
       <View style={styles.mainContainer}>
         <View style={styles.filter}>
-          <Text>{menuList.length}개</Text>
-          <TouchableOpacity
-            onPress={() => setFilter((prev) => (prev === 1 ? 3 : 1))}
-          >
-            <Text>{filter}열보기</Text>
-          </TouchableOpacity>
+          <Text style={styles.filterText}>{menuList.length}개</Text>
+          <Pressable onPress={() => setFilter((prev) => (prev === 1 ? 3 : 1))}>
+            <Text style={styles.filterText}>{filter}열 보기</Text>
+          </Pressable>
         </View>
 
-        <View style={styles.menuContainer}>
-          {menuList.map((menu) => (
-            <MenuCard
-              key={menu.name}
-              menu={menu}
-              filter={filter === 1 ? 3 : 1}
-              onPress={() => {
-                router.push(`/(menu)/${store}/${menu.id}`);
-              }}
-            />
-          ))}
+        <View>
+          <ScrollView
+            contentContainerStyle={{
+              flexDirection: "row",
+              flexWrap: "wrap",
+              rowGap: 30,
+              paddingHorizontal: 20,
+              paddingBottom: 100,
+            }}
+            showsVerticalScrollIndicator={false}
+          >
+            {menuList.map((menu) => (
+              <MenuCard
+                key={menu.name}
+                menu={menu}
+                filter={filter === 1 ? 3 : 1}
+                onPress={() => {
+                  router.push(`/(menu)/${store}/${menu.id}`);
+                }}
+              />
+            ))}
+          </ScrollView>
         </View>
       </View>
 
@@ -138,5 +103,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: "white",
+  },
+  filterText: {
+    fontSize: 18,
   },
 });

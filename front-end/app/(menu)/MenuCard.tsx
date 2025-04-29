@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, Image, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Text, Image, StyleSheet, View, Pressable } from "react-native";
 
 const MenuCard = ({
   menu,
@@ -12,31 +12,35 @@ const MenuCard = ({
 }) => {
   if (filter === 3) {
     return (
-      <TouchableOpacity
+      <Pressable
         style={[styles.container, { flexBasis: `${100 / filter}%` }]}
         onPress={onPress}
       >
         <Image source={{ uri: menu.image }} style={styles.menuImage} />
-        <Text style={styles.name}>{menu.name}</Text>
+        <Text style={[styles.name, { textAlign: "center" }]}>{menu.name}</Text>
         <Text style={styles.price}>{menu.price}원</Text>
-      </TouchableOpacity>
+      </Pressable>
     );
   }
 
   return (
-    <TouchableOpacity
+    <Pressable
       style={[
         styles.container,
-        { flexBasis: `${100 / filter}%`, flexDirection: "row", gap: 30 },
+        {
+          flexBasis: `${100 / filter}%`,
+          flexDirection: "row",
+          gap: 30,
+        },
       ]}
       onPress={onPress}
     >
       <Image source={{ uri: menu.image }} style={styles.menuImage} />
       <View style={{ flex: 1, gap: 10 }}>
         <Text style={styles.name}>{menu.name}</Text>
-        <Text style={styles.price}>{menu.price}원</Text>
+        <Text style={styles.price}>{menu.price.toLocaleString()}원</Text>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
@@ -53,10 +57,11 @@ const styles = StyleSheet.create({
   },
   price: {
     fontWeight: "bold",
-    fontSize: 16,
+    fontSize: 18,
   },
   name: {
-    fontSize: 16,
+    fontSize: 18,
+    fontWeight: "500",
   },
 });
 

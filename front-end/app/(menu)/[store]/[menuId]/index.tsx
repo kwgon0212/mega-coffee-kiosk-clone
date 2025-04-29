@@ -16,6 +16,7 @@ import InfoModal from "./InfoModal";
 import Accordion from "./Accordion";
 import Checkbox from "./Checkbox";
 import Button from "@/components/Button";
+import menuList from "@/assets/mock/menuList";
 
 interface PersonalOption {
   shot: "연하게" | "샷추가" | "2샷 추가" | null;
@@ -24,12 +25,6 @@ interface PersonalOption {
   topping: string[];
 }
 
-interface RecommendOption {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-}
 const MenuDetailPage = () => {
   const { menuId, store } = useLocalSearchParams();
   const [isOpenInfoModal, setIsOpenInfoModal] = useState(false);
@@ -43,57 +38,43 @@ const MenuDetailPage = () => {
     sweetener: [],
     topping: [],
   });
-  const [useRecommend, setUseRecommend] = useState<RecommendOption[]>([]);
   const [amount, setAmount] = useState(1);
 
-  const menu = {
-    id: 1,
-    name: "라떼",
-    price: 5000,
-    image: "https://picsum.photos/200/300",
-    description: "라떼는 커피와 우유를 섞은 음료입니다.",
-    info: {
-      Kcal: 16.7,
-      natrium: 0.7,
-      carbohydrate: 2.1,
-      sugar: 0,
-      fat: 0.7,
-      transFat: 0,
-      protein: 0.7,
-      caffeine: 290.766,
-      allergy: ["라떼", "커피", "우유"],
-    },
-  };
+  const menu = menuList.find((menu) => menu.id === Number(menuId));
 
   const recommendMenu = [
     {
       id: 99,
       name: "나랑 같이 날아 츄! 우주선 빨대 텀블러",
       price: 21900,
-      image: "https://picsum.photos/200/300",
+      image:
+        "https://img.79plus.co.kr/megahp/manager/upload/menu/20241023211612_1729685772681_nAZ0gCnL21.jpg",
     },
     {
       id: 100,
       name: "나랑 같이 마셔 츄! 콜드컵 키링 텀블러",
       price: 16900,
-      image: "https://picsum.photos/200/300",
+      image:
+        "https://img.79plus.co.kr/megahp/manager/upload/menu/20241023211823_1729685903747_KQC1QUAgR3.jpg",
     },
     {
       id: 101,
       name: "나랑 같이 가자 츄! 하츄핑 실리콘 가방",
       price: 20400,
-      image: "https://picsum.photos/200/300",
+      image:
+        "https://img.79plus.co.kr/megahp/manager/upload/menu/20241023211908_1729685948585_e8lASrT0Uy.jpg",
     },
     {
       id: 102,
       name: "나랑 같이 냠냠 츄! 로켓 멀티통",
       price: 9900,
-      image: "https://picsum.photos/200/300",
+      image:
+        "https://img.79plus.co.kr/megahp/manager/upload/menu/20241023212015_1729686015557_fh9lJdKwGu.jpg",
     },
   ];
 
   const totalPrice =
-    menu.price * amount +
+    menu?.price * amount +
     (usePersonal.shot === "샷추가" ? 600 : 0) +
     (usePersonal.shot === "2샷 추가" ? 1200 : 0) +
     usePersonal.syrup.length * 700 +
@@ -122,7 +103,7 @@ const MenuDetailPage = () => {
           onPress={() => setIsOpenInfoModal(true)}
         >
           <View>
-            <Image source={{ uri: menu.image }} style={styles.image} />
+            <Image source={{ uri: menu?.image }} style={styles.image} />
             <MaterialCommunityIcons
               style={{
                 position: "absolute",
@@ -137,8 +118,8 @@ const MenuDetailPage = () => {
               color="white"
             />
           </View>
-          <Text style={styles.name}>{menu.name}</Text>
-          <Text style={styles.description}>{menu.description}</Text>
+          <Text style={styles.name}>{menu?.name}</Text>
+          <Text style={styles.description}>{menu?.description}</Text>
         </Pressable>
 
         <Pressable
@@ -337,7 +318,7 @@ const MenuDetailPage = () => {
       <InfoModal
         isOpen={isOpenInfoModal}
         setIsOpen={setIsOpenInfoModal}
-        info={menu.info}
+        info={menu?.info}
       />
     </ScrollView>
   );
@@ -354,8 +335,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   image: {
-    width: 100,
-    height: 100,
+    width: 150,
+    height: 150,
   },
   name: {
     fontSize: 20,

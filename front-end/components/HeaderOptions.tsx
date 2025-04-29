@@ -28,7 +28,12 @@ const HeaderOptions = ({
         horizontal
         showsHorizontalScrollIndicator={false}
         style={styles.scrollContent}
-        contentContainerStyle={{ gap: 10 }}
+        contentContainerStyle={{
+          gap: 20,
+          paddingVertical: 20,
+          paddingRight: 30,
+        }}
+        bounces={false}
       >
         {options.map((option) => (
           <TouchableOpacity
@@ -68,7 +73,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerOptionText: {
-    fontSize: 16,
+    fontSize: 22,
     textAlign: "center",
   },
   selected: {
