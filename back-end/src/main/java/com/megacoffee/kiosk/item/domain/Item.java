@@ -1,5 +1,7 @@
 package com.megacoffee.kiosk.item.domain;
 
+import com.megacoffee.kiosk.detail.domain.Detail;
+import com.megacoffee.kiosk.optioncategories.domain.OptionCategories;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,7 +12,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "item")
-@ToString
+@ToString(exclude = {"availableOptionCategories"})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,16 +28,17 @@ public class Item {
     @Column(nullable = false)
     private Integer itemPrice;
 
-    @Column(name = "detail_id")
-    private Long detailId;
+    @OneToOne
+    @JoinColumn(name = "detail_id")
+    private Detail detail;
 
-    @ElementCollection
-    @CollectionTable(
+    @ManyToMany
+    @JoinTable(
         name = "item_option_categories",
-        joinColumns = @JoinColumn(name = "item_id")
+        joinColumns = @JoinColumn(name = "item_id"),
+        inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    @Column(name = "category_id")
-    private List<Long> optionCategoryIds;
+    private List<OptionCategories> availableOptionCategories;
 
     @Column(nullable = false)
     private boolean itemSoldout;

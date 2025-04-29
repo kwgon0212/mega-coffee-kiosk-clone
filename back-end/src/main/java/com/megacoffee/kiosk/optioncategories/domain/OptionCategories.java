@@ -1,5 +1,6 @@
 package com.megacoffee.kiosk.optioncategories.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.megacoffee.kiosk.item.domain.Item;
 import com.megacoffee.kiosk.itemoption.domain.ItemOption;
 import jakarta.persistence.*;
@@ -26,6 +27,7 @@ public class OptionCategories {
     private String categoryDescription;
     private Integer categoryOrder;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "availableOptionCategories")
     private List<Item> items;
 
