@@ -53,11 +53,11 @@ class CreateMemberMapperTest {
 //                .nickName("chul")
 //                .gender(Gender.FEMALE)
 //                .phoneNumber("010-3333-4444")
-//                .dateOfBirth(LocalDate.of(1985, 5, 15))
-//                .role(Role.ADMIN)
+//                .birth(LocalDate.of(1985, 5, 15))
+//                .role(Role.USER)
 //                .build();
 //
-//        CreateMemberCommand cmd = mapper.toCommand(entity);
+//        CreateMemberCommand cmd = mapper.toDomain(entity);
 //
 //        assertThat(cmd.getMemberAccount()).isEqualTo(entity.getMemberAccount());
 //        assertThat(cmd.getMemberPw()).isEqualTo(entity.getMemberPw());

@@ -1,7 +1,5 @@
-package com.megacoffee.kiosk.member.application;
+package com.megacoffee.kiosk.member.application.service;
 
-import com.megacoffee.kiosk.member.adapter.outbound.MemberEntity;
-import com.megacoffee.kiosk.member.adapter.outbound.MemberJpaRepository;
 import com.megacoffee.kiosk.member.application.dto.CreateMemberCommand;
 import com.megacoffee.kiosk.member.application.dto.CreateMemberMapper;
 import com.megacoffee.kiosk.member.application.dto.SaveMemberBean;
@@ -11,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -42,9 +39,7 @@ public class MemberService {
 
     @Transactional
     public void updateMember(UUID memberId,
-                             String newNickName,
-                             String phoneNumber,
-                             String name) {
+                             String newNickName) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NoSuchElementException("회원이 없습니다. id=" + memberId));
         member.changeNickName(newNickName);
