@@ -1,10 +1,4 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-} from "react-native";
+import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 
 interface Option {
   id: string;
@@ -23,20 +17,20 @@ const HeaderOptions = ({
   onSelect,
 }: HeaderOptionsProps) => {
   return (
-    <View style={{ width: "100%" }}>
+    <View style={{ width: "100%", borderBottomWidth: 0.2, paddingBottom: 5 }}>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         style={styles.scrollContent}
         contentContainerStyle={{
           gap: 20,
-          paddingVertical: 20,
+          paddingTop: 20,
           paddingRight: 30,
         }}
         bounces={false}
       >
         {options.map((option) => (
-          <TouchableOpacity
+          <Pressable
             key={option.id}
             style={styles.headerOption}
             onPress={() => onSelect(option.id)}
@@ -54,7 +48,7 @@ const HeaderOptions = ({
             <View
               style={selectedOption === option.id ? styles.selected : null}
             />
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </ScrollView>
     </View>
