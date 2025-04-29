@@ -2,48 +2,56 @@ package com.megacoffee.kiosk.member.application;
 
 import com.megacoffee.kiosk.member.adapter.outbound.MemberEntity;
 import com.megacoffee.kiosk.member.adapter.outbound.MemberJpaRepository;
+import com.megacoffee.kiosk.member.application.dto.CreateMemberCommand;
+import com.megacoffee.kiosk.member.application.dto.CreateMemberMapper;
+import com.megacoffee.kiosk.member.application.dto.SaveMemberBean;
+import com.megacoffee.kiosk.member.application.port.out.MemberRepository;
+import com.megacoffee.kiosk.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class MemberService  {
-
-    private final MemberJpaRepository memberJpaRepository;
+public class MemberService {
+    private final MemberRepository memberRepository;
+    private final CreateMemberMapper createMapper;
+    private final SaveMemberBean saveBean;
 
     @Transactional
-    public Long join(MemberEntity member) {
-        // 회원 가입 로직
-        validateDuplicateMember(member);
-        memberJpaRepository.save(member);
-        return member.getId();
+    public UUID join(CreateMemberCommand cmd) {
+        Member member = createMapper.toDomain(cmd);
+        Member saved = saveBean.exec(member);
+        return saved.getId();
     }
 
-    private void validateDuplicateMember(MemberEntity member) {
-        // 중복 회원 검증
-        memberJpaRepository.findById(member.getId())
-                .ifPresent(m -> {
-                    throw new IllegalStateException("이미 존재하는 회원입니다.");
-                });
+    @Transactional(readOnly = true)
+    public Member findOne(UUID memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new NoSuchElementException("회원이 없습니다. id=" + memberId));
     }
 
-    public MemberEntity findOne(Long memberId) {
-        return memberJpaRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 회원이 존재하지 않습니다."));
-    }
+//    @Transactional(readOnly = true)
+//    public List<Member> findMembers() {
+//        return memberRepository.findAll();
+//    }
 
-    public List<MemberEntity> findMembers() {
-        return memberJpaRepository.findAll();
-    }
-    public Long updateMember(Long Id, String nickname, String phoneNumber, String name) {
-        MemberEntity member = findOne(Id);
-        memberJpaRepository.updateNickname(member, nickname);
-        memberJpaRepository.updatePhoneNumber(member, phoneNumber);
-        memberJpaRepository.updateName(member, name);
-        return member.getId();
+    @Transactional
+    public void updateMember(UUID memberId,
+                             String newNickName,
+                             String phoneNumber,
+                             String name) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NoSuchElementException("회원이 없습니다. id=" + memberId));
+        member.changeNickName(newNickName);
+        // 도메인 메서드로 phoneNumber, name 변경 추가 가정
+//        member.changePhoneNumber(phoneNumber);
+//        member.changeName(name);
+        memberRepository.save(member);
     }
 }
+

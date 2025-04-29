@@ -1,7 +1,7 @@
 package com.megacoffee.kiosk.member.application.service;
 
-import com.megacoffee.kiosk.member.adapter.outbound.MemberJpaRepository;
 import com.megacoffee.kiosk.member.application.port.in.UpdateMemberNickname;
+import com.megacoffee.kiosk.member.application.port.out.MemberRepository;
 import com.megacoffee.kiosk.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,18 +14,16 @@ import java.util.UUID;
 @Transactional
 @RequiredArgsConstructor
 public class UpdateMemberNicknameService implements UpdateMemberNickname {
-    private final MemberJpaRepository memberRepo;  // application.port.out
+
+    // 포트 인터페이스 주입
+    private final MemberRepository memberRepository;
 
     @Override
     public void exec(UUID memberId, String newNickName) {
-        // ① 도메인 객체 조회
-        Member member = memberRepo.findById(memberId)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NoSuchElementException("회원이 없습니다. id=" + memberId));
 
-        // ② 도메인 행위로 닉네임 변경
         member.changeNickName(newNickName);
-
-        // ③ 저장 (포트 통해 어댑터로 전파)
-        memberRepo.save(member);
+        memberRepository.save(member);
     }
 }

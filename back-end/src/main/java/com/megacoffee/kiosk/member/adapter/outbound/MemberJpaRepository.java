@@ -1,5 +1,6 @@
 package com.megacoffee.kiosk.member.adapter.outbound;
 
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

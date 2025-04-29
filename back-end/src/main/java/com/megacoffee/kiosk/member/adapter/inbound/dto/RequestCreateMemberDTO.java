@@ -5,6 +5,7 @@ import com.megacoffee.kiosk.member.domain.Role;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 @Data
 @NoArgsConstructor
@@ -15,7 +16,7 @@ public class RequestCreateMemberDTO {
     String nickName;
     Gender gender;
     String phoneNumber;
-    Date date;
+    LocalDate date;
     Role role;
 
 }

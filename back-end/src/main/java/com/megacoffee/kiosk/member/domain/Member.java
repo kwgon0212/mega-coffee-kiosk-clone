@@ -21,6 +21,7 @@ public class Member {
                   String account,
                   String password,
                   String name,
+                  String nickName,
                   Gender gender,
                   String phoneNumber,
                   LocalDate dateOfBirth,
@@ -30,6 +31,7 @@ public class Member {
         this.account  = account;
         this.password = password;
         this.name     = name;
+        this.nickName = nickName;
         this.gender   = gender;
         this.phoneNumber = phoneNumber;
         this.dateOfBirth = dateOfBirth;

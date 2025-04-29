@@ -5,6 +5,7 @@ import com.megacoffee.kiosk.member.domain.Member;
 import com.megacoffee.kiosk.member.domain.Role;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.time.ZoneId;
 import java.util.Date;
@@ -18,7 +19,7 @@ import java.util.UUID;
 @Builder
 public class MemberEntity {
 
-    @Id @GeneratedValue
+    @Id
     @Column(name = "member_id")
     private UUID memberId;
 
@@ -53,6 +54,7 @@ public class MemberEntity {
                 this.memberAccount,
                 this.memberPw,
                 this.name,
+                this.nickName,
                 this.gender,
                 this.phoneNumber,
                 this.birth.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
