@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 
 interface CheckboxProps {
   isChecked: boolean;
@@ -12,12 +12,12 @@ const Checkbox = ({ isChecked, setIsChecked, label }: CheckboxProps) => {
     setIsChecked(!isChecked);
   };
   return (
-    <TouchableOpacity onPress={toggleCheckbox} style={styles.checkboxContainer}>
+    <Pressable onPress={toggleCheckbox} style={styles.checkboxContainer}>
       <View style={[styles.checkbox, isChecked && styles.checked]}>
         {isChecked && <Text style={styles.checkmark}>✓</Text>}
       </View>
       {label && <Text style={styles.label}>{label}</Text>}
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 

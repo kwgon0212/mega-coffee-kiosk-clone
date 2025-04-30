@@ -5,6 +5,7 @@ import HeaderOptions from "@/components/HeaderOptions";
 import Feather from "@expo/vector-icons/Feather";
 import MenuCard from "../MenuCard";
 import menuList from "@/assets/mock/menuList";
+import CartButton from "@/components/CartButton";
 
 export default function StoreMenu() {
   const { store } = useLocalSearchParams<{ store: string }>();
@@ -63,7 +64,7 @@ export default function StoreMenu() {
 
       <View style={styles.footer}>
         <Text style={styles.footerText}>{store}</Text>
-        <Feather name="shopping-cart" size={24} color="white" />
+        <CartButton color="white" />
       </View>
     </View>
   );
