@@ -142,7 +142,9 @@ const CartPage = () => {
         <View style={{ paddingHorizontal: 20 }}>
           <Button
             text="주문하기"
-            onPress={() => {}}
+            onPress={() => {
+              router.push("/(order)");
+            }}
             backgroundColor="#452613"
             color="white"
           />

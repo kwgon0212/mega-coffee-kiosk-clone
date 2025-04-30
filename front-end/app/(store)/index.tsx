@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import StoreCard from "./StoreCard";
 import { router } from "expo-router";
@@ -7,7 +7,12 @@ import StoreModal from "./StoreModal";
 
 interface Store {
   name: string;
-  address: string;
+  address: {
+    zipCode: string;
+    city: string;
+    street: string;
+    detail: string;
+  };
   distance: number;
   lat: number;
   lng: number;
@@ -17,22 +22,16 @@ const StorePage = () => {
   const [isOpenStoreModal, setIsOpenStoreModal] = useState(false);
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
 
-  const storeList = [
-    {
-      name: "중구 중림점",
-      address: "서울특별시 중구 청파로 47-1, 1층(중림동)",
-      distance: 47,
-      lat: 37.5665,
-      lng: 126.9783,
-    },
-    {
-      name: "충정로역점",
-      address: "서울특별시 중구 중림로 10, 상가1동 1층 104-2호(중림동)",
-      distance: 325,
-      lat: 37.5665,
-      lng: 126.9783,
-    },
-  ];
+  const [storeList, setStoreList] = useState<Store[]>([]);
+
+  useEffect(() => {
+    const fetchStoreList = async () => {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/store`);
+      const data = await response.json();
+      setStoreList(data);
+    };
+    fetchStoreList();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -60,7 +59,7 @@ const StorePage = () => {
               <StoreCard
                 key={index}
                 name={store.name}
-                address={store.address}
+                address={`${store.address.city} ${store.address.street} ${store.address.detail}`}
                 distance={store.distance}
                 onPress={() => {
                   // router.push(`/(menu)/${store.name}`);

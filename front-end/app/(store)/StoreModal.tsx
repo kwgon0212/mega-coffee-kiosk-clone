@@ -14,7 +14,12 @@ interface StoreModalProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   info: {
     name: string;
-    address: string;
+    address: {
+      zipCode: string;
+      city: string;
+      street: string;
+      detail: string;
+    };
     distance: number;
     lat: number;
     lng: number;

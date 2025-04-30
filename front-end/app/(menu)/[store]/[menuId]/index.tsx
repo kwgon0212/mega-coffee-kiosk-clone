@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -13,14 +13,13 @@ import Entypo from "@expo/vector-icons/Entypo";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import InfoModal from "./InfoModal";
-import Accordion from "./Accordion";
-import Checkbox from "./Checkbox";
 import Button from "@/components/Button";
-import menuList from "@/assets/mock/menuList";
 import { useCartStore } from "@/store/useCartStore";
 import Toast from "react-native-toast-message";
 import recommendMenu from "@/assets/mock/recommendedMenu";
-import { CartItem } from "@/type";
+import { CartItem, Menu } from "@/type";
+import Accordion from "@/components/Accordion";
+import Checkbox from "@/components/Checkbox";
 
 interface PersonalOption {
   shot: "연하게" | "샷추가" | "2샷 추가" | null;
@@ -36,6 +35,7 @@ const MenuDetailPage = () => {
   };
   const { addToCart } = useCartStore();
 
+  const [menu, setMenu] = useState<Menu | null>(null);
   const [isOpenInfoModal, setIsOpenInfoModal] = useState(false);
   const [isOpenCupAccordion, setIsOpenCupAccordion] = useState(false);
   const [isOpenPersonalAccordion, setIsOpenPersonalAccordion] = useState(false);
@@ -49,16 +49,37 @@ const MenuDetailPage = () => {
   });
   const [quantity, setQuantity] = useState(1);
 
-  console.log(isUsePersonal);
-  const menu = menuList.find((menu) => menu.id === Number(menuId))!;
+  useEffect(() => {
+    const fetchMenuData = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.EXPO_PUBLIC_BASE_URL}/menus?id=${menuId}`
+        );
 
-  const totalPrice =
-    menu?.price +
-    (isUsePersonal.shot === "샷추가" ? 600 : 0) +
-    (isUsePersonal.shot === "2샷 추가" ? 1200 : 0) +
-    isUsePersonal.syrup.length * 700 +
-    isUsePersonal.sweetener.length * 1000 +
-    isUsePersonal.topping.length * 700;
+        if (!response.ok) {
+          router.back();
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setMenu(data[0]);
+      } catch (error) {
+        router.back();
+        console.error("데이터를 가져오는 중 오류 발생:", error);
+      }
+    };
+
+    fetchMenuData();
+  }, [menuId, store]);
+
+  const totalPrice = menu
+    ? menu.price +
+      (isUsePersonal.shot === "샷추가" ? 600 : 0) +
+      (isUsePersonal.shot === "2샷 추가" ? 1200 : 0) +
+      isUsePersonal.syrup.length * 700 +
+      isUsePersonal.sweetener.length * 1000 +
+      isUsePersonal.topping.length * 700
+    : 0;
 
   const togglePersonalArray = (
     key: "sweetener" | "topping" | "syrup",
@@ -89,6 +110,8 @@ const MenuDetailPage = () => {
   };
 
   const handleOrder = () => {
+    if (!menu) return;
+
     const cartItem: CartItem = {
       id: menu.id,
       store,
@@ -105,6 +128,8 @@ const MenuDetailPage = () => {
   };
 
   const handleAddToCart = () => {
+    if (!menu) return;
+
     Toast.show({ type: "successAddCart" });
     const cartItem: CartItem = {
       id: menu.id,
@@ -119,6 +144,15 @@ const MenuDetailPage = () => {
     addToCart(cartItem);
     resetState();
   };
+
+  if (!menu)
+    return (
+      <Layout
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      >
+        <Text>메뉴 정보를 불러오는 중입니다.</Text>
+      </Layout>
+    );
 
   return (
     <ScrollView bounces={false}>
@@ -344,11 +378,13 @@ const MenuDetailPage = () => {
         </View>
       </Layout>
 
-      <InfoModal
-        isOpen={isOpenInfoModal}
-        setIsOpen={setIsOpenInfoModal}
-        info={menu?.info}
-      />
+      {menu && (
+        <InfoModal
+          isOpen={isOpenInfoModal}
+          setIsOpen={setIsOpenInfoModal}
+          info={menu.info}
+        />
+      )}
     </ScrollView>
   );
 };

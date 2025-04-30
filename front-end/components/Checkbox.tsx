@@ -1,18 +1,29 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  StyleProp,
+  ViewStyle,
+} from "react-native";
 
 interface CheckboxProps {
   isChecked: boolean;
   setIsChecked: React.Dispatch<React.SetStateAction<boolean>>;
   label?: string;
+  style?: StyleProp<ViewStyle>;
 }
 
-const Checkbox = ({ isChecked, setIsChecked, label }: CheckboxProps) => {
+const Checkbox = ({ isChecked, setIsChecked, label, style }: CheckboxProps) => {
   const toggleCheckbox = () => {
     setIsChecked(!isChecked);
   };
   return (
-    <Pressable onPress={toggleCheckbox} style={styles.checkboxContainer}>
+    <Pressable
+      onPress={toggleCheckbox}
+      style={[styles.checkboxContainer, style]}
+    >
       <View style={[styles.checkbox, isChecked && styles.checked]}>
         {isChecked && <Text style={styles.checkmark}>✓</Text>}
       </View>
@@ -27,7 +38,7 @@ const styles = StyleSheet.create({
   checkboxContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 10,
+    marginVertical: 5,
   },
   checkbox: {
     width: 20,

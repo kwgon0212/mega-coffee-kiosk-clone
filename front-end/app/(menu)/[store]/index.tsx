@@ -1,16 +1,39 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import HeaderOptions from "@/components/HeaderOptions";
-import Feather from "@expo/vector-icons/Feather";
 import MenuCard from "../MenuCard";
-import menuList from "@/assets/mock/menuList";
 import CartButton from "@/components/CartButton";
+import { Menu } from "@/type";
 
 export default function StoreMenu() {
   const { store } = useLocalSearchParams<{ store: string }>();
   const [selectedOption, setSelectedOption] = useState("new");
   const [filter, setFilter] = useState(1);
+  const [menuList, setMenuList] = useState<Menu[]>([]);
+
+  useEffect(() => {
+    const fetchMenuAllData = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.EXPO_PUBLIC_BASE_URL}/menus`
+        );
+
+        if (!response.ok) {
+          router.back();
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setMenuList(data);
+      } catch (error) {
+        router.back();
+        console.error("데이터를 가져오는 중 오류 발생:", error);
+      }
+    };
+
+    fetchMenuAllData();
+  }, []);
 
   return (
     <View style={styles.container}>

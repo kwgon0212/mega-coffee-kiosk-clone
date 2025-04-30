@@ -6,8 +6,8 @@ export interface Menu {
   description: string;
   price: number;
   isUseTumbler: boolean;
-  detailInfo: {
-    Kcal: number;
+  info: {
+    kcal: number;
     natrium: number;
     carbohydrate: number;
     sugar: number;
