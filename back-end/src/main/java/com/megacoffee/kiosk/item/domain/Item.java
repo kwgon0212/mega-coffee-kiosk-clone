@@ -13,5 +13,5 @@ public class Item {
     @Column(name = "item_id")
     private Long id;
     private int price;
-
+    private String itemName;
 }

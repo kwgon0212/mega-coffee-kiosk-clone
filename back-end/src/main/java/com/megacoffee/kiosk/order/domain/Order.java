@@ -1,51 +1,22 @@
 package com.megacoffee.kiosk.order.domain;
 
-import com.megacoffee.kiosk.member.domain.Member;
-import com.megacoffee.kiosk.ordermenu.domain.OrderMenu;
-import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-@Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order {
 
-    @Id
-    @GeneratedValue
-    @Column(name = "order_id")
-    private UUID id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
-
-    @Column(name = "order_count")
-    private int orderCount;
-
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderMenu> orderMenus = new ArrayList<>();
-
-    @Column(name = "order_totalprice")
-    private int totalPrice;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "order_status")
-    private OrderStatus orderStatus;
-
-    @Column(name = "order_date")
-    private LocalDateTime orderDateTime;
-
-    @Column(name = "order_number")
+    private String memberId;
     private int orderNumber;
-
+    private int orderCount;
+    private List<OrderMenu> orderMenus = new ArrayList<>();
+    private int totalPrice;
+    private OrderStatus orderStatus;
+    private String storeName;
+    private LocalDateTime orderDateTime;
     //== 연관관계 메서드 ==//
 
     /**
@@ -56,17 +27,17 @@ public class Order {
         orderMenu.setOrder(this);
         this.totalPrice += orderMenu.getPrices();
     }
-    public void settingMember(Member member) {
-        this.member = member;
-    }
 
     //== 생성 메서드 ==//
 
-    public static Order createOrder(Member member, List<OrderMenu> orderMenus) {
+    public static Order createOrder(String memberId, List<OrderMenu> orderMenus , String storeName , int orderNumber) {
         Order order = new Order();
+        order.memberId = memberId;
         order.orderCount = orderMenus.size();
-        order.orderDateTime = LocalDateTime.now();
         order.orderStatus = OrderStatus.PENDING;
+        order.storeName = storeName;
+        order.orderNumber = orderNumber;
+        order.orderDateTime = LocalDateTime.now();
         for (OrderMenu orderMenu : orderMenus) {
             order.addOrderMenu(orderMenu);
         }
@@ -74,6 +45,7 @@ public class Order {
     }
 
     //== 비즈니스 로직 ==//
+
 
     /**
      * 주문 취소
