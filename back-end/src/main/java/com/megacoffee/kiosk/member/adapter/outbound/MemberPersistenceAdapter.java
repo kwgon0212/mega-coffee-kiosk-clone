@@ -5,6 +5,7 @@ import com.megacoffee.kiosk.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,5 +28,15 @@ public class MemberPersistenceAdapter implements MemberRepository {
         MemberEntity entity = MemberEntity.fromDomain(member);
         MemberEntity saved  = jpaRepository.save(entity);
         return saved.toDomain();
+    }
+
+    @Override
+    public List<Member> findAll(){
+        return jpaRepository.findAll().stream().map(MemberEntity::toDomain).toList();
+    }
+
+    @Override
+    public Optional<Member> findByAccount(String account) {
+        return jpaRepository.findByAccount(account).map(MemberEntity::toDomain);
     }
 }

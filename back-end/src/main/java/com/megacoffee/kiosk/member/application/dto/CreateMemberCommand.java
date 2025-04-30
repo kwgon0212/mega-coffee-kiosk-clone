@@ -18,6 +18,6 @@ public class CreateMemberCommand {
     private String nickName;
     private Gender gender;
     private String phoneNumber;
-    private LocalDate dateOfBirth;
+    private LocalDate birth;
     private Role role;
 }

@@ -1,14 +1,16 @@
 package com.megacoffee.kiosk.member.adapter.outbound;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
 import com.megacoffee.kiosk.member.domain.Gender;
 import com.megacoffee.kiosk.member.domain.Member;
 import com.megacoffee.kiosk.member.domain.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.type.SqlTypes;
 
-import java.time.ZoneId;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -20,7 +22,14 @@ import java.util.UUID;
 public class MemberEntity {
 
     @Id
-    @Column(name = "member_id")
+    @Column(
+            name             = "member_id",
+            updatable        = false,
+            nullable         = false,
+            length           = 36,
+            columnDefinition = "CHAR(36)"
+    )
+    @JdbcTypeCode(SqlTypes.CHAR)
     private UUID memberId;
 
     @Column(name = "member_account")
@@ -35,6 +44,7 @@ public class MemberEntity {
     @Column(name = "member_nickname")
     private String nickName;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "member_gender")
     private Gender gender;
 
@@ -42,7 +52,7 @@ public class MemberEntity {
     private String phoneNumber;
 
     @Column(name = "member_birth")
-    private Date birth;
+    private LocalDate birth;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "member_role")
@@ -57,7 +67,7 @@ public class MemberEntity {
                 this.nickName,
                 this.gender,
                 this.phoneNumber,
-                this.birth.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
+                this.birth,
                 this.role
         );
     }
@@ -71,7 +81,7 @@ public class MemberEntity {
                 .nickName(domain.getNickName())
                 .gender(domain.getGender())
                 .phoneNumber(domain.getPhoneNumber())
-                .birth(Date.from(domain.getDateOfBirth().atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                .birth(domain.getBirth())
                 .role(domain.getRole())
                 .build();
     }

@@ -1,20 +1,22 @@
 package com.megacoffee.kiosk.member.domain;
 
+import lombok.Getter;
+
 import java.time.LocalDate;
 import java.util.UUID;
-
+@Getter
 public class Member {
     // 고유 식별자
     private final UUID id;
     // 비즈니스 속성
-    private String account;
-    private String password;
-    private String name;
+    private final String account;
+    private final String password;
+    private final String name;
     private String nickName;
-    private Gender gender;
-    private String phoneNumber;
-    private LocalDate dateOfBirth;
-    private Role role;
+    private final Gender gender;
+    private final String phoneNumber;
+    private final LocalDate birth;
+    private final Role role;
 
     // 생성자: 필수 속성만 받도록
     public Member(UUID id,
@@ -24,7 +26,7 @@ public class Member {
                   String nickName,
                   Gender gender,
                   String phoneNumber,
-                  LocalDate dateOfBirth,
+                  LocalDate birth,
                   Role role) {
         // (유효성 검증 등 도메인 로직 수행)
         this.id       = id;
@@ -34,7 +36,7 @@ public class Member {
         this.nickName = nickName;
         this.gender   = gender;
         this.phoneNumber = phoneNumber;
-        this.dateOfBirth = dateOfBirth;
+        this.birth = birth;
         this.role     = role;
     }
 
@@ -52,28 +54,4 @@ public class Member {
 //        return PasswordEncoder.matches(rawPassword, this.password);
 //    }
 
-    // (getter만 제공, setter 없음)
-    public UUID getId() {
-        return id; }
-    public String getAccount() {
-        return account; }
-    public String getName() {
-        return name; }
-    public String getNickName() {
-        return nickName; }
-    public String getPassword() {
-        return password;
-    }
-    public Gender getGender() {
-        return gender;
-    }
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-    public LocalDate getDateOfBirth() {
-        return dateOfBirth;
-    }
-    public Role getRole() {
-        return role;
-    }
 }

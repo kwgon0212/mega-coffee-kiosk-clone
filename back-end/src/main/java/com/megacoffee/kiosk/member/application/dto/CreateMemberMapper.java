@@ -16,7 +16,7 @@ public class CreateMemberMapper {
                 cmd.getNickName(),
                 cmd.getGender(),
                 cmd.getPhoneNumber(),
-                cmd.getDateOfBirth(),
+                cmd.getBirth(),
                 cmd.getRole()
         );
     }
