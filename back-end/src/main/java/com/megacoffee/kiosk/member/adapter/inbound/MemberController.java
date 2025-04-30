@@ -3,6 +3,7 @@ package com.megacoffee.kiosk.member.adapter.inbound;
 import com.megacoffee.kiosk.member.adapter.inbound.dto.RequestCreateMemberDTO;
 import com.megacoffee.kiosk.member.adapter.inbound.dto.RequestLoginDTO;
 import com.megacoffee.kiosk.member.adapter.inbound.dto.ResponseGetMemberDTO;
+import com.megacoffee.kiosk.member.adapter.inbound.dto.ResponseLoginDTO;
 import com.megacoffee.kiosk.member.application.dto.CreateMemberCommand;
 import com.megacoffee.kiosk.member.application.port.in.*;
 
@@ -56,14 +57,16 @@ public class MemberController {
 
     @PostMapping("/auth/login")
     @Operation(summary = "로그인", description = "아이디,이메일 과 비밀번호를 입력받아서 로그인을 진행합니다.")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody RequestLoginDTO reLogin){
+    public ResponseEntity<Map<String, Object>> login(@RequestBody RequestLoginDTO reqLogin){
         //login 서비스 호출
-        boolean success = loginMember.exec(reLogin);
+        ResponseLoginDTO responseLoginDTO = loginMember.exec(reqLogin);
         //응답 전송
+        boolean success = responseLoginDTO != null;
+
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.put("success", success);
         responseMap.put("message", success ? "로그인 성공" : "로그인 실패");
-
+        responseMap.put("userInfo", responseLoginDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseMap);
     }
 

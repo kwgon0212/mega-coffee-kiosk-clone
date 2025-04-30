@@ -18,8 +18,4 @@ public class GetUserEntityBean {
                 .orElseThrow(() -> new NoSuchElementException("회원이 없습니다. id=" + memberId));
     }
 
-    public Member exec(String account){
-        return memberRepository.findByAccount(account)
-                .orElseThrow(() -> new NoSuchElementException("회원이 없습니다. id=" + account));
-    }
 }
