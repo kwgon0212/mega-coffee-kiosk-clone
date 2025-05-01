@@ -15,6 +15,7 @@ public class MenuCreateRequest {
     private String itemCategory;
     private String itemSubCategory;
     private String itemMenuDetail;
+    private Integer itemMakeTime;
     private Integer itemPrice;
     private boolean itemSoldout;
 

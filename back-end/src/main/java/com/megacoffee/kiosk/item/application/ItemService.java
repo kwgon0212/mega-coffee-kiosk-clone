@@ -47,6 +47,7 @@ public class ItemService {
         item.setItemPrice(request.getItemPrice());
         item.setItemSoldout(request.isItemSoldout());
         item.setDetailId(detail);
+        item.setItemMakeTime(request.getItemMakeTime());
         item = itemRepository.save(item);
 
         // 3. OptionCategories와 ItemOption 생성
@@ -110,6 +111,7 @@ public class ItemService {
         item.setItemMenuDetail(request.getItemMenuDetail());
         item.setItemPrice(request.getItemPrice());
         item.setItemSoldout(request.isItemSoldout());
+        item.setItemMakeTime(request.getItemMakeTime());
         item.setDetailId(detail);
         item = itemRepository.save(item);
 
@@ -200,6 +202,7 @@ public class ItemService {
         dto.setItemMenuDetail(item.getItemMenuDetail());
         dto.setItemPrice(item.getItemPrice());
         dto.setItemSoldout(item.isItemSoldout());
+        dto.setItemMakeTime(item.getItemMakeTime());
 
         // Detail 정보 설정
         Detail detail = item.getDetailId();
@@ -223,7 +226,8 @@ public class ItemService {
                     .map(optionCategory -> {
                         OptionCategoryDTO optionCategoryDTO = new OptionCategoryDTO();
                         optionCategoryDTO.setCategoryName(optionCategory.getCategoryName());
-                        
+                        optionCategoryDTO.setCategoryDescription(optionCategory.getCategoryDescription());
+                        optionCategoryDTO.setCategoryOrder(optionCategory.getCategoryOrder());
                         // Option 정보 설정
                         List<OptionDTO> optionDTOs = optionCategory.getOptions().stream()
                                 .map(option -> {

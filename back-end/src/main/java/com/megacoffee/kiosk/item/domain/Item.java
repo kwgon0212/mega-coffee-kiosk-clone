@@ -28,7 +28,7 @@ public class Item {
     private String itemMenuDetail;
     @Column(nullable = false)
     private Integer itemPrice;
-
+    private Integer itemMakeTime;
     @OneToOne
     @JoinColumn(name = "detail_id")
     private Detail detailId;
