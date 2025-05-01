@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, Pressable, Image } from "react-native";
 
 interface StoreCardProps {
   name: string;
@@ -10,7 +10,7 @@ interface StoreCardProps {
 
 const StoreCard = ({ name, address, distance, onPress }: StoreCardProps) => {
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress}>
+    <Pressable style={styles.container} onPress={onPress}>
       <View style={styles.infoContainer}>
         <Text style={styles.name}>{name}</Text>
         <Text style={styles.address}>{address}</Text>
@@ -22,7 +22,7 @@ const StoreCard = ({ name, address, distance, onPress }: StoreCardProps) => {
           style={styles.storeImage}
         />
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
@@ -37,11 +37,11 @@ const styles = StyleSheet.create({
   infoContainer: {
     flex: 1,
     flexDirection: "column",
-    gap: 5,
+    gap: 8,
   },
   name: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 20,
+    fontWeight: "600",
   },
   address: {
     fontSize: 14,

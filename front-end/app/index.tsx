@@ -14,8 +14,6 @@ const LandingPage = () => {
         />
       </View>
       <View style={styles.buttonContainer}>
-        <Button text="test" onPress={() => {}} />
-        <Button text="test" onPress={() => {}} />
         <Button
           text="로그인 / 회원가입"
           onPress={() => {

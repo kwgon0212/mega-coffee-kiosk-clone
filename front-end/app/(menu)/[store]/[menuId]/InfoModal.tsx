@@ -11,7 +11,7 @@ interface InfoModalProps {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   info: {
-    Kcal: number;
+    kcal: number;
     natrium: number;
     carbohydrate: number;
     sugar: number;
@@ -37,7 +37,7 @@ const InfoModal = ({ isOpen, setIsOpen, info }: InfoModalProps) => {
               <View style={styles.modalInfoContainer}>
                 <View style={styles.modalInfoItem}>
                   <Text style={styles.modalInfoItemTitle}>칼로리(Kcal)</Text>
-                  <Text style={styles.modalInfoItemValue}>{info.Kcal}</Text>
+                  <Text style={styles.modalInfoItemValue}>{info.kcal}</Text>
                 </View>
                 <View style={styles.modalInfoItem}>
                   <Text style={styles.modalInfoItemTitle}>나트륨(mg)</Text>
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modalContent: {
-    width: 300,
+    width: "90%",
     paddingHorizontal: 20,
     paddingVertical: 40,
     backgroundColor: "white",

@@ -6,14 +6,28 @@ interface AccordionProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   children: React.ReactNode;
   title: string;
+  subtitle?: string;
 }
 
-const Accordion = ({ isOpen, setIsOpen, children, title }: AccordionProps) => {
+const Accordion = ({
+  isOpen,
+  setIsOpen,
+  children,
+  title,
+  subtitle,
+}: AccordionProps) => {
   return (
     <View style={styles.container}>
       <Pressable onPress={() => setIsOpen(!isOpen)} style={styles.header}>
         <Text style={styles.headerText}>{title}</Text>
-        <Entypo name="chevron-thin-down" size={20} color="black" />
+        <View style={styles.headerRight}>
+          <Text style={styles.subtitleText}>{subtitle}</Text>
+          <Entypo
+            name={`chevron-thin-${isOpen ? "up" : "down"}`}
+            size={20}
+            color="black"
+          />
+        </View>
       </Pressable>
 
       {isOpen && children}
@@ -24,7 +38,8 @@ const Accordion = ({ isOpen, setIsOpen, children, title }: AccordionProps) => {
 const styles = StyleSheet.create({
   container: {
     overflow: "hidden",
-    boxShadow: "0px 1px 3px 0px rgba(0, 0, 0, 0.05)",
+    boxShadow: "0px 1px 5px 0px rgba(0, 0, 0, 0.2)",
+    borderRadius: 10,
   },
   header: {
     flexDirection: "row",
@@ -36,6 +51,15 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 18,
     fontWeight: "bold",
+  },
+  subtitleText: {
+    fontSize: 14,
+    color: "gray",
+  },
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
   },
 });
 

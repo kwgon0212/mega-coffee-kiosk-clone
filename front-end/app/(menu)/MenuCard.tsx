@@ -18,7 +18,7 @@ const MenuCard = ({
       >
         <Image source={{ uri: menu.image }} style={styles.menuImage} />
         <Text style={[styles.name, { textAlign: "center" }]}>{menu.name}</Text>
-        <Text style={styles.price}>{menu.price}원</Text>
+        <Text style={styles.price}>{menu.price.toLocaleString()}원</Text>
       </Pressable>
     );
   }

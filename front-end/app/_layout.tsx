@@ -1,3 +1,4 @@
+import React from "react";
 import {
   DarkTheme,
   DefaultTheme,
@@ -12,6 +13,8 @@ import "react-native-reanimated";
 import { router } from "expo-router";
 import Header from "@/components/Header";
 import Button from "@/components/Button";
+import ToastProvider from "@/components/Toast";
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
@@ -31,22 +34,25 @@ export default function RootLayout() {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen
-        name="(auth)"
-        options={{
-          header: ({ navigation, route, options }) => (
-            <Header
-              title="로그인 / 회원가입"
-              showBackButton={navigation.canGoBack()}
-            />
-          ),
-        }}
-      />
-      <Stack.Screen name="(store)" />
-      <Stack.Screen name="(menu)/[store]" />
-      <Stack.Screen name="+not-found" />
+    <>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen
+          name="(auth)"
+          options={{
+            header: ({ navigation, route, options }) => (
+              <Header
+                title="로그인 / 회원가입"
+                showBackButton={navigation.canGoBack()}
+              />
+            ),
+          }}
+        />
+        <Stack.Screen name="(store)" />
+        <Stack.Screen name="(menu)/[store]" />
+        <Stack.Screen name="+not-found" />
+      </Stack>
+      <ToastProvider />
       <StatusBar style="auto" />
-    </Stack>
+    </>
   );
 }

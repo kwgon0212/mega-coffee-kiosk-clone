@@ -32,7 +32,7 @@ export default function MenuLayout() {
             <Header
               showBackButton
               borderBottomWidth={0}
-              rightNode={<CartButton onPress={() => {}} />}
+              rightNode={<CartButton />}
             />
           ),
         }}

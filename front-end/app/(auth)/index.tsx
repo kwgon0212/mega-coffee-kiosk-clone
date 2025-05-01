@@ -20,7 +20,7 @@ export default function Login() {
           placeholderTextColor="#666"
           secureTextEntry
         />
-        <Button text="로그인" onPress={() => router.push("/(store)")} />
+        <Button text="로그인" onPress={() => router.replace("/(store)")} />
       </View>
     </View>
   );
