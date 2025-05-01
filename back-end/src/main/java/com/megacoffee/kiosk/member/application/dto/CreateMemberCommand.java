@@ -7,11 +7,13 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateMemberCommand {
+    private UUID memberId;
     private String memberAccount;
     private String memberPw;
     private String name;

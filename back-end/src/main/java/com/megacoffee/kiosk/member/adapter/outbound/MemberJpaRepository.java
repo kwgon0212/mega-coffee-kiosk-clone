@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MemberJpaRepository extends JpaRepository<MemberEntity, UUID> {
-    Optional<MemberEntity> findByAccount(String account);
+    Optional<MemberEntity> findByMemberAccount(String account);
 //        List<MemberEntity> findAll();
 //    public void save(Member member);
 //    public void deleteById(Long id);
