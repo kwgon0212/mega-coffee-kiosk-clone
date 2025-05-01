@@ -1,0 +1,21 @@
+package com.megacoffee.kiosk.item.dto;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.List;
+
+@Getter
+@Setter
+@NoArgsConstructor
+public class ItemDetailDTO {
+    private String itemName;
+    private String itemMenuDetail;
+    private Integer itemPrice;
+    private boolean itemSoldout;
+    private DetailDTO detail;
+    private List<OptionCategoryDTO> optionCategories;
+}
+
+
