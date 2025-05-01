@@ -4,6 +4,7 @@ import StoreCard from "./StoreCard";
 import { router } from "expo-router";
 import HeaderOptions from "@/components/HeaderOptions";
 import StoreModal from "./StoreModal";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 interface Store {
   name: string;
@@ -79,6 +80,13 @@ const StorePage = () => {
           info={selectedStore}
         />
       )}
+
+      <TouchableOpacity
+        style={styles.adminButton}
+        onPress={() => router.push("/(admin)")}
+      >
+        <MaterialIcons name="admin-panel-settings" size={24} color="black" />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -110,6 +118,18 @@ const styles = StyleSheet.create({
   },
   storeCount: {
     fontSize: 18,
+  },
+  adminButton: {
+    position: "absolute",
+    bottom: 50,
+    right: 20,
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: "100%",
+    shadowColor: "black",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
 });
 
