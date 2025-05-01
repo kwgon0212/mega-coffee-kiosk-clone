@@ -15,19 +15,18 @@ public class OrderMenu {
     private int itemCount;
     private int itemPrice;
     private ItemOption option;
-    private int prices;
     private OptionCategories optionCategories;
     private List<OrderOption> orderOptions = new ArrayList<>();
     private OrderMenuStatus orderMenuStatus;
     //== 연관관계 메서드 ==//
-    public void setOrder(Order order) {
+    public void setOrderEntity(Order order) {
         this.order = order;
-        order.getOrderMenus().add(this);
     }
     public void addOrderOption(OrderOption orderOption) {
         orderOptions.add(orderOption);
         orderOption.assignOrderMenu(this);
-        prices += orderOption.getOptionPrice();
+        System.out.println("name: "+ orderOption.getOptionName()+"orderOption.getOptionPrice() = " + orderOption.getOptionPrice());
+
     }
 
     //== 생성 메서드 ==//
@@ -36,7 +35,6 @@ public class OrderMenu {
         orderMenu.itemCount = itemCount;
         orderMenu.itemPrice = itemPrice;
         orderMenu.itemName = itemName;
-        orderMenu.prices = itemPrice * itemCount;
         for (OrderOption orderOption : orderOptions) {
             orderMenu.addOrderOption(orderOption);
         }
@@ -45,7 +43,12 @@ public class OrderMenu {
     }
 
     //== 비즈니스 로직 ==//
-
+    public int calculatePrice() {
+        int optionPriceSum = orderOptions.stream()
+                .mapToInt(OrderOption::getOptionPrice)
+                .sum();
+        return (itemPrice + optionPriceSum) * itemCount;
+    }
     /**
      * 주문 메뉴 취소
      */
@@ -56,6 +59,5 @@ public class OrderMenu {
         }
         this.orderMenuStatus = OrderMenuStatus.CANCELED;
         this.itemCount = 0;
-        this.prices = -prices;
     }
 }

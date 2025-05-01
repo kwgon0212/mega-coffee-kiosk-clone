@@ -1,9 +1,12 @@
 package com.megacoffee.kiosk.order.adapter.outbound.persistence;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +22,7 @@ public class OrderMenuEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
+    @JsonBackReference
     private OrderEntity order;
 
     @Column(name = "item_name")
@@ -31,6 +35,7 @@ public class OrderMenuEntity {
     private int quantity;
 
     @OneToMany(mappedBy = "orderMenu", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<OrderOptionEntity> orderOptions = new ArrayList<>();
 
     //== 연관관계 편의 메서드 ==//
@@ -44,8 +49,11 @@ public class OrderMenuEntity {
     }
 
     //== 생성 메서드 ==//
-    public static OrderMenuEntity createOrderMenuEntity(String itemName, int prices, int quantity) {
+    public static OrderMenuEntity createOrderMenuEntity(List<OrderOptionEntity> orderOptionEntityList,String itemName, int prices, int quantity) {
         OrderMenuEntity orderMenu = new OrderMenuEntity();
+        for (OrderOptionEntity orderOption : orderOptionEntityList) {
+            orderMenu.addOrderOption(orderOption);
+        }
         orderMenu.itemName = itemName;
         orderMenu.prices = prices;
         orderMenu.quantity = quantity;

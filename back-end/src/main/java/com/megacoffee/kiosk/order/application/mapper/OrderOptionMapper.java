@@ -13,7 +13,6 @@ public class OrderOptionMapper {
 
     public static OrderOptionEntity toEntity(OrderOption domain) {
         return OrderOptionEntity.createOrderOptionEntity(
-                domain.getOrderMenu(),
                 domain.getOptionName(),
                 domain.getOptionPrice()
         );

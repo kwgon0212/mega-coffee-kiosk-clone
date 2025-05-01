@@ -1,5 +1,6 @@
-package com.megacoffee.kiosk.order.adapter.inbound.web.dto;
+package com.megacoffee.kiosk.order.adapter.inbound.web.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,11 +11,10 @@ import java.util.List;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderMenuDto {
+@Schema(description = "주문 생성 요청 DTO")
+public class OrderMenuRequestDto {
     private String itemName;
     private int itemPrice;
     private int quantity;
-    private List<OrderOptionDto> options;
-
-
+    private List<OrderOptionRequestDto> optionDtos;
 }

@@ -28,6 +28,11 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
+    public OrderEntity findById(UUID id) {
+        return em.find(OrderEntity.class, id);
+    }
+
+    @Override
     public OrderEntity findByOrderNumber(int orderNumber) {
         return em.createQuery("SELECT o FROM OrderEntity o WHERE o.orderNumber = :orderNumber", OrderEntity.class)
                 .setParameter("orderNumber", orderNumber)
@@ -41,12 +46,21 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
+    public List<OrderEntity> findAll(UUID memberId) {
+        return em.createQuery("SELECT o FROM OrderEntity o WHERE o.memberId = :memberId", OrderEntity.class)
+                .setParameter("memberId", memberId)
+                .getResultList();
+    }
+
+    @Override
     public int findMaxOrderNumber(LocalDateTime start, LocalDateTime end) {
-        return em.createQuery("SELECT MAX(o.orderNumber) FROM OrderEntity o WHERE o.orderDate BETWEEN :start AND :end", Integer.class)
+        Integer maxNum = em.createQuery("SELECT MAX(o.orderNumber) FROM OrderEntity o WHERE o.orderDate BETWEEN :start AND :end", Integer.class)
                 .setParameter("start", start)
                 .setParameter("end", end)
                 .getSingleResult();
+        return maxNum == null ? 1 : maxNum + 1;
     }
+
 
 
 }

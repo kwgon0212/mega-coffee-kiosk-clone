@@ -1,5 +1,6 @@
 package com.megacoffee.kiosk.order.adapter.outbound.persistence;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.megacoffee.kiosk.order.domain.OrderMenu;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -16,6 +17,8 @@ public class OrderOptionEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ordermenu_id")
+    @JsonBackReference
+
     private OrderMenuEntity orderMenu;
 
     @Column(name = "option_name")
@@ -30,7 +33,7 @@ public class OrderOptionEntity {
     }
 
     //== 생성 메서드 ==//
-    public static OrderOptionEntity createOrderOptionEntity(OrderMenu orderMenu, String optionName, int optionPrice) {
+    public static OrderOptionEntity createOrderOptionEntity(String optionName, int optionPrice) {
         OrderOptionEntity orderOptionEntity = new OrderOptionEntity();
         orderOptionEntity.optionName = optionName;
         orderOptionEntity.optionPrice = optionPrice;
