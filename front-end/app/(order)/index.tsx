@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import BottomSheet from "./BottomSheet";
 import { useCartStore } from "@/store/useCartStore";
+import { router } from "expo-router";
 
 const CouponBottomSheet = BottomSheet;
 
@@ -33,6 +34,7 @@ const OrderPage = () => {
     console.log("packageOption", packageOption);
     console.log("paymentMethod", paymentMethod);
     console.log("cart", cart);
+    router.push("/(order)/list/123");
   };
 
   return (

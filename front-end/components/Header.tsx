@@ -9,11 +9,13 @@ interface HeaderProps {
   showBackButton?: boolean;
   rightNode?: React.ReactNode;
   borderBottomWidth?: number;
+  onPressBackButton?: () => void;
 }
 
 export default function Header({
   title,
   showBackButton = false,
+  onPressBackButton,
   rightNode,
   borderBottomWidth = 0.2,
 }: HeaderProps) {
@@ -25,7 +27,13 @@ export default function Header({
         <View style={styles.leftContainer}>
           {showBackButton && (
             <TouchableOpacity
-              onPress={() => router.back()}
+              onPress={() => {
+                if (onPressBackButton) {
+                  onPressBackButton();
+                } else {
+                  router.back();
+                }
+              }}
               style={styles.backButton}
             >
               <Entypo name="chevron-thin-left" size={20} color="black" />
