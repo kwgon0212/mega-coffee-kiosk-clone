@@ -10,5 +10,5 @@ public interface MemberRepository {
     Optional<Member> findById(UUID id);
     Member save(Member member);
     List<Member> findAll();
-    Optional<Member> findByAccount(String account);
+//    Optional<Member> findByAccount(String account);
 }

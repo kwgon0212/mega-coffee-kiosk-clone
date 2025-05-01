@@ -13,7 +13,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ResponseGetMemberDTO {
     private UUID id;
-    private String memberAccount;
     private String name;
     private String nickName;
     private Gender gender;
@@ -24,7 +23,6 @@ public class ResponseGetMemberDTO {
     public static ResponseGetMemberDTO fromDomain(Member m) {
         return new ResponseGetMemberDTO(
                 m.getId(),
-                m.getAccount(),
                 m.getName(),
                 m.getNickName(),
                 m.getGender(),

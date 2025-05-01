@@ -10,8 +10,6 @@ public class CreateMemberMapper {
     public Member toDomain(CreateMemberCommand cmd) {
         return new Member(
                 cmd.getMemberId(),
-                cmd.getMemberAccount(),
-                cmd.getMemberPw(),
                 cmd.getName(),
                 cmd.getNickName(),
                 cmd.getGender(),

@@ -11,6 +11,7 @@ import com.megacoffee.kiosk.auth.domain.model.RefreshToken;
 import com.megacoffee.kiosk.auth.domain.service.AuthenticationService;
 import com.megacoffee.kiosk.auth.domain.service.TokenPair;
 import com.megacoffee.kiosk.auth.infrastructure.jwt.JwtProvider;
+import com.megacoffee.kiosk.member.application.port.out.DeleteMemberPort;
 import com.megacoffee.kiosk.member.domain.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -29,6 +30,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final DeleteAuthPort deleteAuthPort;
     private final JwtProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
+    private final DeleteMemberPort deleteMemberPort;
 
     @Override
     public UUID signUp(Credentials creds) {
@@ -109,7 +111,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void deleteMember(UUID memberId) {
         // 인증 정보 삭제
+        // 1) auth 테이블에서 인증 정보 삭제
         deleteAuthPort.deleteByMemberId(memberId);
-        // 필요 시 회원 도메인 삭제 로직 호출
+
+        // 2) member 테이블에서 프로필 정보 삭제
+        deleteMemberPort.deleteById(memberId);
     }
 }

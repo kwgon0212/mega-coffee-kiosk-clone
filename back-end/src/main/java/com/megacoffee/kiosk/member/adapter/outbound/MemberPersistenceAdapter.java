@@ -35,8 +35,8 @@ public class MemberPersistenceAdapter implements MemberRepository {
         return jpaRepository.findAll().stream().map(MemberEntity::toDomain).toList();
     }
 
-    @Override
-    public Optional<Member> findByAccount(String account) {
-        return jpaRepository.findByMemberAccount(account).map(MemberEntity::toDomain);
-    }
+//    @Override
+//    public Optional<Member> findByAccount(String account) {
+//        return jpaRepository.findByMemberAccount(account).map(MemberEntity::toDomain);
+//    }
 }

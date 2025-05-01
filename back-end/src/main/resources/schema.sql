@@ -1,4 +1,5 @@
--- schema.sql
-ALTER TABLE member
-  MODIFY COLUMN member_id CHAR(36)
-    CHARACTER SET ascii NOT NULL;
+ALTER TABLE auth
+  ALTER COLUMN account TYPE VARCHAR(100);
+
+ALTER TABLE auth
+  ALTER COLUMN account SET NOT NULL;

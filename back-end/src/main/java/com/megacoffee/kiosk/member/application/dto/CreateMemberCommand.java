@@ -14,12 +14,11 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CreateMemberCommand {
     private UUID memberId;
-    private String memberAccount;
-    private String memberPw;
     private String name;
     private String nickName;
     private Gender gender;
     private String phoneNumber;
     private LocalDate birth;
     private Role role;
+
 }

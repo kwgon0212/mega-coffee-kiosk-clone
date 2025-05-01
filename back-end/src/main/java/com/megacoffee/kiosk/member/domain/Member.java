@@ -9,8 +9,6 @@ public class Member {
     // 고유 식별자
     private final UUID id;
     // 비즈니스 속성
-    private final String account;
-    private final String password;
     private final String name;
     private String nickName;
     private final Gender gender;
@@ -20,8 +18,6 @@ public class Member {
 
     // 생성자: 필수 속성만 받도록
     public Member(UUID id,
-                  String account,
-                  String password,
                   String name,
                   String nickName,
                   Gender gender,
@@ -30,8 +26,6 @@ public class Member {
                   Role role) {
         // (유효성 검증 등 도메인 로직 수행)
         this.id       = id;
-        this.account  = account;
-        this.password = password;
         this.name     = name;
         this.nickName = nickName;
         this.gender   = gender;

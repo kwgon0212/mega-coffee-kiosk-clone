@@ -32,12 +32,6 @@ public class MemberEntity {
     @JdbcTypeCode(SqlTypes.CHAR)
     private UUID memberId;
 
-    @Column(name = "member_account")
-    private String memberAccount;
-
-    @Column(name = "member_pw")
-    private String memberPw;
-
     @Column(name = "member_name")
     private String name;
 
@@ -61,8 +55,6 @@ public class MemberEntity {
     public Member toDomain() {
         return new Member(
                 this.memberId,
-                this.memberAccount,
-                this.memberPw,
                 this.name,
                 this.nickName,
                 this.gender,
@@ -75,8 +67,6 @@ public class MemberEntity {
     public static MemberEntity fromDomain(Member domain) {
         return MemberEntity.builder()
                 .memberId(domain.getId())
-                .memberAccount(domain.getAccount())
-                .memberPw(domain.getPassword())
                 .name(domain.getName())
                 .nickName(domain.getNickName())
                 .gender(domain.getGender())

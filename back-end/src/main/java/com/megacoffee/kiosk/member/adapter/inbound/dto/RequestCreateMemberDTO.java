@@ -10,8 +10,6 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 public class RequestCreateMemberDTO {
-    String memberAccount;
-    String memberPw;
     String name;
     String nickName;
     Gender gender;
