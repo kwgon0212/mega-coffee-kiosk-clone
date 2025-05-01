@@ -24,13 +24,14 @@ public class Item {
     @Column(nullable = false)
     private String itemName;
     private String itemCategory;
+    private String itemSubCategory;
     private String itemMenuDetail;
     @Column(nullable = false)
     private Integer itemPrice;
 
     @OneToOne
     @JoinColumn(name = "detail_id")
-    private Detail detail;
+    private Detail detailId;
 
     @ManyToMany
     @JoinTable(
