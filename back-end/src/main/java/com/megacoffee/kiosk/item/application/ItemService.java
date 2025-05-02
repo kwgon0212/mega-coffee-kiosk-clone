@@ -57,6 +57,7 @@ public class ItemService {
                     OptionCategories optionCategory = new OptionCategories();
                     optionCategory.setCategoryName(categoryRequest.getCategoryName());
                     optionCategory.setCategoryDescription(categoryRequest.getCategoryDescription());
+                    optionCategory.setCategoryOrder(categoryRequest.getCategoryOrder());
                     optionCategory = optionCategoriesService.save(optionCategory);
 
                     // ItemOption 생성
@@ -133,6 +134,7 @@ public class ItemService {
                     OptionCategories optionCategory = new OptionCategories();
                     optionCategory.setCategoryName(categoryRequest.getCategoryName());
                     optionCategory.setCategoryDescription(categoryRequest.getCategoryDescription());
+                    optionCategory.setCategoryOrder(categoryRequest.getCategoryOrder());
                     optionCategory = optionCategoriesService.save(optionCategory);
 
                     final OptionCategories finalOptionCategory = optionCategory;
@@ -234,6 +236,7 @@ public class ItemService {
                                     OptionDTO optionDTO = new OptionDTO();
                                     optionDTO.setOptionName(option.getOptionName());
                                     optionDTO.setOptionPrice(option.getOptionPrice());
+                                    optionDTO.setOptionAvailable(option.isOptionAvailable());
                                     return optionDTO;
                                 })
                                 .collect(Collectors.toList());

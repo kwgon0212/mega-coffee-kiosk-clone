@@ -12,5 +12,6 @@ import java.util.List;
 public class OptionCategoryRequest {
     private String categoryName;
     private String categoryDescription;
+    private Integer categoryOrder;
     private List<ItemOptionRequest> options;
 } 
