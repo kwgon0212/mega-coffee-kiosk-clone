@@ -21,5 +21,6 @@ public class OrderRequestDto {
     private PackageOption packageOption;
     private Integer discountPrice;
     private String paymentMethod;
-
+    private String nickName;
+    private Integer itemMakeTime;
 }

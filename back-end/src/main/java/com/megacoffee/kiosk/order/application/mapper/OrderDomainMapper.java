@@ -13,7 +13,8 @@ import java.util.List;
 
 public class OrderDomainMapper {
     public static OrderEntity toEntity(Order domain, String requestMessage, boolean takeOut,
-                                       PackageOption packageOption, Integer discountPrice, String paymentMethod) {
+                                       PackageOption packageOption, Integer discountPrice, String paymentMethod,
+                                       String nickName, Integer itemMakeTime) {
         List<OrderMenuEntity> orderMenuEntityList = new ArrayList<>();
         if (domain.getOrderMenus() != null) {
             orderMenuEntityList = domain.getOrderMenus().stream().
@@ -31,7 +32,9 @@ public class OrderDomainMapper {
                 paymentMethod,
                 packageOption,
                 discountPrice,
-                takeOut
+                takeOut,
+                nickName,
+                itemMakeTime
         );
     }
 

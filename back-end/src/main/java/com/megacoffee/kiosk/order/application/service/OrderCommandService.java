@@ -33,7 +33,9 @@ public class OrderCommandService implements CreateOrderUseCase {
                 orderRequestDto.isTakeOut(),
                 orderRequestDto.getPackageOption(),
                 orderRequestDto.getDiscountPrice(),
-                orderRequestDto.getPaymentMethod()
+                orderRequestDto.getPaymentMethod(),
+                orderRequestDto.getNickName(),
+                orderRequestDto.getItemMakeTime()
                 );
         // 주문 저장
         orderRepository.save(orderEntity);

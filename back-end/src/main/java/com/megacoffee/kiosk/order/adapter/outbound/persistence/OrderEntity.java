@@ -69,11 +69,18 @@ public class OrderEntity {
 
     @Column(name = "isTakeOut")
     private boolean isTakeOut;
+
+    @Column(name = "nickname")
+    private String nickname;
+
+    @Column(name = "item_make_time")
+    private Integer itemMakeTime;
     //== 생성 메서드 ==//
 
     public static OrderEntity createOrderEntity(
             UUID memberId, int menuCount, String storeName, int orderNumber, List<OrderMenuEntity> orderMenus , int totalPrice,
-            String requestMessage, String paymentMethod, PackageOption packageOption, Integer discountPrice ,boolean isTakeOut
+            String requestMessage, String paymentMethod, PackageOption packageOption, Integer discountPrice ,boolean isTakeOut,
+            String nickname, Integer itemMakeTime
     ) {
         OrderEntity order = new OrderEntity();
         order.memberId =memberId;
@@ -91,6 +98,8 @@ public class OrderEntity {
         order.packageOption = packageOption;
         order.discountPrice = discountPrice;
         order.isTakeOut = isTakeOut;
+        order.nickname = nickname;
+        order.itemMakeTime = itemMakeTime;
         return order;
     }
 

@@ -54,14 +54,14 @@ public class AdminOrderResponseDto {
 //
 
 
-    public static AdminOrderResponseDto from(OrderEntity orderEntity, String nickname, Integer itemMakeTime) {
+    public static AdminOrderResponseDto from(OrderEntity orderEntity) {
         List<OrderMenuDto> menus = orderEntity.getOrderMenus().stream()
                 .map(OrderMenuDto::from)
                 .toList();
         return new AdminOrderResponseDto(
                 orderEntity.getId(),
-                nickname,
-                itemMakeTime,
+                orderEntity.getNickname(),
+                orderEntity.getItemMakeTime(),
                 orderEntity.getDiscountPrice(),
                 orderEntity.getStoreName(),
                 orderEntity.getOrderNumber(),

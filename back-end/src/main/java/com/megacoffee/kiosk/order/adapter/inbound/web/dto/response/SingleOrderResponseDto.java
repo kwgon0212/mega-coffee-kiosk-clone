@@ -49,7 +49,7 @@ public class SingleOrderResponseDto {
     @Schema(description = "할인 금액")
     private Integer discountPrice;
 
-    public static SingleOrderResponseDto from(OrderEntity orderEntity, Integer itemMakeTime) {
+    public static SingleOrderResponseDto from(OrderEntity orderEntity) {
         List<OrderMenuDto> menus = orderEntity.getOrderMenus().stream()
                 .map(OrderMenuDto::from)
                 .toList();
@@ -60,7 +60,7 @@ public class SingleOrderResponseDto {
                 orderEntity.getOrderDate(),
                 orderEntity.getOrderStatus(),
                 orderEntity.getOrderCount(),
-                itemMakeTime,
+                orderEntity.getItemMakeTime(),
                 menus,
                 orderEntity.getPaymentMethod(),
                 orderEntity.getDiscountPrice()
