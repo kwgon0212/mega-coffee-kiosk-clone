@@ -1,8 +1,8 @@
 package com.megacoffee.kiosk.order.domain;
 
 public enum OrderStatus {
-    PENDING, // 주문 대기
-    IN_PROGRESS, // 주문 진행 중
+    CONFIRMED, // 주문 확인
     COMPLETED, // 주문 완료
-    CANCELLED // 주문 취소
+    RREPAIRING, // 주문 제작 중
+    PAYMENT_DONE, // 결제 완료
 }

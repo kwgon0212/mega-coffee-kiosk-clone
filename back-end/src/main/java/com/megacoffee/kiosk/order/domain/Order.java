@@ -35,7 +35,7 @@ public class Order {
     public static Order createOrder(UUID memberId, List<OrderMenu> orderMenus , String storeName , int orderNumber) {
         Order order = new Order();
         order.memberId = memberId;
-        order.orderStatus = OrderStatus.PENDING;
+        order.orderStatus = OrderStatus.PAYMENT_DONE;
         order.storeName = storeName;
         order.orderNumber = orderNumber;
         order.orderDateTime = LocalDateTime.now();
@@ -58,18 +58,4 @@ public class Order {
 //        this.orderStatus = orderStatus;
 //    }
 
-    /**
-     * 주문 취소
-     */
-    public void cancelOrder() {
-        if (orderStatus == OrderStatus.COMPLETED) {
-            throw new IllegalStateException("주문이 이미 완료되어 취소할 수 없습니다.");
-        } else if (orderStatus == OrderStatus.CANCELLED) {
-            throw new IllegalStateException("주문이 이미 취소되었습니다.");
-        }
-        this.orderStatus = OrderStatus.CANCELLED;
-        for (OrderMenu orderMenu : orderMenus) {
-            orderMenu.cancelOrderMenu();
-        }
-    }
 }

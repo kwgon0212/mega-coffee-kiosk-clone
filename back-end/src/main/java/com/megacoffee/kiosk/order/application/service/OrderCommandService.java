@@ -28,7 +28,13 @@ public class OrderCommandService implements CreateOrderUseCase {
         // DTO -> Domain 변환
         Order order = OrderDtoMapper.DtoToDomain(userId,orderRequestDto, orderNumber);
         // Domain -> Entity 변환
-        OrderEntity orderEntity = OrderDomainMapper.toEntity(order);
+        OrderEntity orderEntity = OrderDomainMapper.toEntity(order,
+                orderRequestDto.getRequestMessage(),
+                orderRequestDto.isTakeOut(),
+                orderRequestDto.getPackageOption(),
+                orderRequestDto.getDiscountPrice(),
+                orderRequestDto.getPaymentMethod()
+                );
         // 주문 저장
         orderRepository.save(orderEntity);
 

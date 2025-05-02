@@ -14,10 +14,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @Schema(description = "주문 생성 응답 DTO")
 public class OrderCreateResponseDto {
-    private int orderNumber;
+    private Integer orderNumber;
     private OrderStatus status;
+    private Integer OrderNumber;
 
     public static OrderCreateResponseDto from(Order order) {
-        return new OrderCreateResponseDto(order.getOrderNumber(),order.getOrderStatus());
+        return new OrderCreateResponseDto(order.getOrderNumber(),order.getOrderStatus(), order.getOrderNumber());
     }
 }

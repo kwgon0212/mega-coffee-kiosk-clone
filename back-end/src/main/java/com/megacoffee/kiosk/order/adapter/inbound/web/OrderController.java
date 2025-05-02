@@ -3,7 +3,8 @@ package com.megacoffee.kiosk.order.adapter.inbound.web;
 import com.megacoffee.kiosk.global.response.SuccessResponse;
 import com.megacoffee.kiosk.order.adapter.inbound.web.dto.request.OrderRequestDto;
 import com.megacoffee.kiosk.order.adapter.inbound.web.dto.response.OrderCreateResponseDto;
-import com.megacoffee.kiosk.order.adapter.inbound.web.dto.response.OrderResponseDto;
+import com.megacoffee.kiosk.order.adapter.inbound.web.dto.response.AllOrderResponseDto;
+import com.megacoffee.kiosk.order.adapter.inbound.web.dto.response.SingleOrderResponseDto;
 import com.megacoffee.kiosk.order.adapter.outbound.persistence.OrderEntity;
 import com.megacoffee.kiosk.order.application.port.inbound.CreateOrderUseCase;
 import com.megacoffee.kiosk.order.application.port.inbound.FindOrderUseCase;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Order API", description = "주문 관련 API")
@@ -32,7 +34,11 @@ public class OrderController {
     private final CreateOrderUseCase createOrderUseCase;
     private final FindOrderUseCase findOrderUseCase;
     //== 주문 생성 ==//
-    @Operation(summary = "주문 생성" , description = "주문을 생성합니다.")
+    @Operation(summary = "주문 생성" , description = "주문을 생성합니다.",
+    responses = @ApiResponse(
+            content = @Content(schema = @Schema(oneOf = {OrderCreateResponseDto.class}) , mediaType = "application/json")
+    ))
+
     @PostMapping("/{userId}")
     public ResponseEntity<?> createOrder(@PathVariable UUID userId , @RequestBody OrderRequestDto orderRequestDto) {
         // 주문 생성
@@ -44,46 +50,46 @@ public class OrderController {
     //== 주문 조회 ==//
     @Operation(summary = "모든 유저 주문 조회", description = "모든 유저의 주문 내역을 조회합니다.")
     @ApiResponses(
-            @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = OrderResponseDto.class))))
+            @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = AllOrderResponseDto.class))))
     )
-    @GetMapping("/")
+    @GetMapping("/admin")
     public ResponseEntity<?> findAllOrders() {
         // 모든 유저의 주문 조회
         List<OrderEntity> allOrders = findOrderUseCase.findAllOrders();
-        List<OrderResponseDto> orderResponseDtos = allOrders.stream()
-                .map(OrderResponseDto::from)
+        List<AllOrderResponseDto> allOrderResponseDtos = allOrders.stream()
+                .map(AllOrderResponseDto::from)
                 .toList();
         // 주문 조회 성공 응답
-        return ResponseEntity.ok(SuccessResponse.success("모든 유저의 주문 내역 조회에 성공하였습니다", orderResponseDtos));
+        return ResponseEntity.ok(SuccessResponse.success("모든 유저의 주문 내역 조회에 성공하였습니다", allOrderResponseDtos));
     }
 
     @Operation(summary = "주문 조회" , description = "사용자의 주문 내역을 모두 조회합니다.")
     @ApiResponses(
-            @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = OrderResponseDto.class))))
+            @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = AllOrderResponseDto.class))))
     )
     @GetMapping("/{userId}")
     public ResponseEntity<?> findOrder(@PathVariable UUID userId) {
         // 주문 조회
         List<OrderEntity> allOrders = findOrderUseCase.findAllOrders(userId);
-        List<OrderResponseDto> orderResponseDtos = allOrders.stream()
-                .map(OrderResponseDto::from)
+        List<AllOrderResponseDto> allOrderResponseDtos = allOrders.stream()
+                .map(AllOrderResponseDto::from)
                 .toList();
         // 주문 조회 성공 응답
-        return ResponseEntity.ok(SuccessResponse.success("주문 내역 조회에 성공하였습니다", orderResponseDtos));
+        return ResponseEntity.ok(SuccessResponse.success("주문 내역 조회에 성공하였습니다", allOrderResponseDtos));
     }
 
     //== 주문 번호로 주문 조회 ==//
     @Operation(summary = "주문 번호로 주문 조회" , description = "주문 번호로 주문을 조회합니다.")
     @ApiResponse(
-            content = @Content(schema = @Schema(implementation = OrderResponseDto.class) , mediaType = "application/json")
+            content = @Content(schema = @Schema(implementation = AllOrderResponseDto.class) , mediaType = "application/json")
     )
     @GetMapping("/{userId}/{orderId}")
     public ResponseEntity<?> findOrderByOrderId(@PathVariable UUID userId, @PathVariable UUID orderId) {
         // 주문 번호로 주문 조회
         OrderEntity order = findOrderUseCase.findOrderById(orderId);
-        OrderResponseDto orderResponseDto = OrderResponseDto.from(order);
+        SingleOrderResponseDto singleOrderResponseDto = SingleOrderResponseDto.from(order);
         // 주문 조회 성공 응답
-        return ResponseEntity.ok(SuccessResponse.success("주문 상세 조회에 성공하였습니다", orderResponseDto));
+        return ResponseEntity.ok(SuccessResponse.success("주문 상세 조회에 성공하였습니다", singleOrderResponseDto));
     }
 
     //== 특정 주문 상태 업데이트 ==//
@@ -95,7 +101,7 @@ public class OrderController {
         OrderEntity entity = createOrderUseCase.updateState(orderId, newStatus);
 
         // 주문 상태 업데이트 성공 응답
-        return ResponseEntity.ok(SuccessResponse.success("주문 상태 업데이트에 성공하였습니다", OrderResponseDto.from(entity)));
+        return ResponseEntity.ok(SuccessResponse.success("주문 상태 업데이트에 성공하였습니다", null));
     }
 
 

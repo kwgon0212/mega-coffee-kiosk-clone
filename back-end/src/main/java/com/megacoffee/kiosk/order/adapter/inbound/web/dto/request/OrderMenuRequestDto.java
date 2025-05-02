@@ -14,7 +14,7 @@ import java.util.List;
 @Schema(description = "주문 생성 요청 DTO")
 public class OrderMenuRequestDto {
     private String itemName;
-    private int itemPrice;
-    private int quantity;
-    private List<OrderOptionRequestDto> optionDtos;
+    private Integer itemPrice;
+    private Integer quantity;
+    private List<OrderOptionRequestDto> options;
 }

@@ -6,12 +6,14 @@ import com.megacoffee.kiosk.order.adapter.outbound.persistence.OrderOptionEntity
 import com.megacoffee.kiosk.order.domain.Order;
 import com.megacoffee.kiosk.order.domain.OrderMenu;
 import com.megacoffee.kiosk.order.domain.OrderOption;
+import com.megacoffee.kiosk.order.domain.PackageOption;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class OrderDomainMapper {
-    public static OrderEntity toEntity(Order domain) {
+    public static OrderEntity toEntity(Order domain, String requestMessage, boolean takeOut,
+                                       PackageOption packageOption, Integer discountPrice, String paymentMethod) {
         List<OrderMenuEntity> orderMenuEntityList = new ArrayList<>();
         if (domain.getOrderMenus() != null) {
             orderMenuEntityList = domain.getOrderMenus().stream().
@@ -24,7 +26,12 @@ public class OrderDomainMapper {
                 domain.getStoreName(),
                 domain.getOrderNumber(),
                 orderMenuEntityList,
-                domain.getTotalPrice()
+                domain.getTotalPrice(),
+                requestMessage,
+                paymentMethod,
+                packageOption,
+                discountPrice,
+                takeOut
         );
     }
 

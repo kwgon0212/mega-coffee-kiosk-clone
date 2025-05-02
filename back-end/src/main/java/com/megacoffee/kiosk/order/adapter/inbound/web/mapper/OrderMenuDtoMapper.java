@@ -11,8 +11,8 @@ public class OrderMenuDtoMapper {
     public static OrderMenu DtoToDomain(OrderMenuRequestDto dto) {
         List<OrderOption> orderOptions = new ArrayList<>();
         System.out.println("dto.getQuantity() = " + dto.getQuantity());
-        if (dto.getOptionDtos() != null) {
-            orderOptions = dto.getOptionDtos().stream()
+        if (dto.getOptions() != null) {
+            orderOptions = dto.getOptions().stream()
                     .map(OrderOptionDtoMapper::DtoToDomain)
                     .toList();
         }

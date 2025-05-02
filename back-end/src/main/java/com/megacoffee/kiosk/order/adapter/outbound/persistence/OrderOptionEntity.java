@@ -1,6 +1,7 @@
 package com.megacoffee.kiosk.order.adapter.outbound.persistence;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.megacoffee.kiosk.order.domain.OrderMenu;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -17,8 +18,7 @@ public class OrderOptionEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ordermenu_id")
-    @JsonBackReference
-
+    @JsonIgnore
     private OrderMenuEntity orderMenu;
 
     @Column(name = "option_name")

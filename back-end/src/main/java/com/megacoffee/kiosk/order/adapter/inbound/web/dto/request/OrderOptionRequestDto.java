@@ -13,5 +13,5 @@ import lombok.Setter;
 public class OrderOptionRequestDto {
 
     private String optionName;
-    private int optionPrice;
+    private Integer optionPrice;
 }

@@ -1,13 +1,17 @@
 package com.megacoffee.kiosk.order.adapter.outbound.persistence;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.megacoffee.kiosk.member.domain.Member;
 import com.megacoffee.kiosk.order.domain.OrderStatus;
+import com.megacoffee.kiosk.order.domain.PackageOption;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.rmi.server.UID;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,12 +23,11 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderEntity {
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "member_id")
-//    private MemberEntity member;
-
-    @Column(name = "member_id", nullable = false)
+    @Column(name = "member_id")
     private UUID memberId;
+
+//    @Column(name = "member_nickname")
+//    private String memberNickname;
 
     @Id @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "order_id")
@@ -41,7 +44,6 @@ public class OrderEntity {
     private int orderCount;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    @JsonManagedReference
     private List<OrderMenuEntity> orderMenus = new ArrayList<>();
 
     @Column(name = "order_date")
@@ -53,21 +55,42 @@ public class OrderEntity {
     @Column(name = "store_name")
     private String storeName;
 
+    @Column(name = "discount_price")
+    private Integer discountPrice;
 
+    @Column(name = "request_message")
+    private String requestMessage;
+
+    @Column(name = "payment_mothod")
+    private String paymentMethod;
+
+    @Column(name = "packageOption")
+    private PackageOption packageOption;
+
+    @Column(name = "isTakeOut")
+    private boolean isTakeOut;
     //== 생성 메서드 ==//
 
-    public static OrderEntity createOrderEntity(UUID memberId, int menuCount, String storeName, int orderNumber, List<OrderMenuEntity> orderMenus , int totalPrice) {
+    public static OrderEntity createOrderEntity(
+            UUID memberId, int menuCount, String storeName, int orderNumber, List<OrderMenuEntity> orderMenus , int totalPrice,
+            String requestMessage, String paymentMethod, PackageOption packageOption, Integer discountPrice ,boolean isTakeOut
+    ) {
         OrderEntity order = new OrderEntity();
-        order.memberId = memberId;
+        order.memberId =memberId;
         order.storeName = storeName;
         order.orderNumber = orderNumber;
-        order.orderStatus = OrderStatus.PENDING;
+        order.orderStatus = OrderStatus.CONFIRMED;
         order.orderCount = menuCount;
         order.orderDate = LocalDateTime.now();
         for (OrderMenuEntity orderMenu : orderMenus) {
             order.addOrderMenu(orderMenu);
         }
         order.totalPrice = totalPrice;
+        order.requestMessage = requestMessage;
+        order.paymentMethod = paymentMethod;
+        order.packageOption = packageOption;
+        order.discountPrice = discountPrice;
+        order.isTakeOut = isTakeOut;
         return order;
     }
 
@@ -77,11 +100,11 @@ public class OrderEntity {
         orderMenu.setOrderEntity(this);
     }
 
+
+    //== 비즈니스 로직 ==//
     public void changeOrderStatus(OrderStatus orderStatus) {
         if (this.orderStatus == OrderStatus.COMPLETED) {
             throw new IllegalStateException("주문이 이미 완료되어 상태를 변경할 수 없습니다.");
-        } else if (this.orderStatus == OrderStatus.CANCELLED) {
-            throw new IllegalStateException("주문이 이미 취소되어 상태를 변경할 수 없습니다.");
         }
         this.orderStatus = orderStatus;
     }

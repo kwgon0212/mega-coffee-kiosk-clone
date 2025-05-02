@@ -11,8 +11,8 @@ import java.util.UUID;
 public class OrderDtoMapper {
     public static Order DtoToDomain(UUID userId, OrderRequestDto orderRequestDto , int orderNumber) {
         List<OrderMenu> orderMenus = new ArrayList<>();
-        if (orderRequestDto.getOrderMenus() != null) {
-            orderMenus = orderRequestDto.getOrderMenus().stream()
+        if (orderRequestDto.getItems() != null) {
+            orderMenus = orderRequestDto.getItems().stream()
                     .map(OrderMenuDtoMapper::DtoToDomain)
                     .toList();
         }
