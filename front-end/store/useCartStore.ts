@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+// import { persist, createJSONStorage } from "zustand/middleware";
+// import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CartItem } from "@/type";
 
 type CartStore = {
@@ -13,31 +13,31 @@ type CartStore = {
 };
 
 export const useCartStore = create<CartStore>()(
-  persist(
-    (set) => ({
-      cart: [],
-      count: 0,
-      addToCart: (item) =>
-        set((state) => ({
-          cart: [...state.cart, item],
-          count: state.count + 1,
-        })),
-      removeFromCart: (itemId: number) =>
-        set((state) => ({
-          cart: state.cart.filter((item) => item.id !== itemId),
-          count: state.count - 1,
-        })),
-      setQuantity: (itemId: number, quantity: number) =>
-        set((state) => ({
-          cart: state.cart.map((item) =>
-            item.id === itemId ? { ...item, quantity } : item
-          ),
-        })),
-      clearCart: () => set({ cart: [], count: 0 }),
-    }),
-    {
-      name: "cart-storage",
-      storage: createJSONStorage(() => AsyncStorage),
-    }
-  )
+  // persist(
+  (set) => ({
+    cart: [],
+    count: 0,
+    addToCart: (item) =>
+      set((state) => ({
+        cart: [...state.cart, item],
+        count: state.count + 1,
+      })),
+    removeFromCart: (itemId: number) =>
+      set((state) => ({
+        cart: state.cart.filter((item) => item.id !== itemId),
+        count: state.count - 1,
+      })),
+    setQuantity: (itemId: number, quantity: number) =>
+      set((state) => ({
+        cart: state.cart.map((item) =>
+          item.id === itemId ? { ...item, quantity } : item
+        ),
+      })),
+    clearCart: () => set({ cart: [], count: 0 }),
+  })
+  // {
+  //   name: "cart-storage",
+  //   storage: createJSONStorage(() => AsyncStorage),
+  // }
+  // )
 );
