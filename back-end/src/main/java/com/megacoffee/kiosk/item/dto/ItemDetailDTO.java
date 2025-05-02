@@ -13,6 +13,7 @@ public class ItemDetailDTO {
     private String itemName;
     private String itemMenuDetail;
     private Integer itemPrice;
+    private Integer itemMakeTime;
     private boolean itemSoldout;
     private DetailDTO detail;
     private List<OptionCategoryDTO> optionCategories;
