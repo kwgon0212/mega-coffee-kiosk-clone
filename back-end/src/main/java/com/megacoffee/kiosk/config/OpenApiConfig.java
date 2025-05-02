@@ -1,11 +1,28 @@
 package com.megacoffee.kiosk.config;
 
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+
+//@io.swagger.v3.oas.annotations.security.SecurityScheme(
+//        name = "kakao-oauth",
+//        type = SecuritySchemeType.OAUTH2,
+//        in = SecuritySchemeIn.HEADER,
+//        flows = @io.swagger.v3.oas.annotations.security.OAuthFlows(
+//                authorizationCode = @io.swagger.v3.oas.annotations.security.OAuthFlow(
+//                        authorizationUrl = "${app.base-url}/oauth2/authorization/kakao",
+//                        tokenUrl = "${app.base-url}/oauth2/token",
+//                        scopes = {
+//                                @io.swagger.v3.oas.annotations.security.OAuthScope(name = "profile_nickname", description = "카카오 프로필 닉네임")
+//                        }
+//                )
+//        )
+//)
 @Configuration
 public class OpenApiConfig {
     @Bean

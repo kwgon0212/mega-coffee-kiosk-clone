@@ -6,6 +6,7 @@ import com.megacoffee.kiosk.auth.domain.model.Credentials;
 import com.megacoffee.kiosk.auth.domain.model.OauthProvider;
 import com.megacoffee.kiosk.auth.domain.service.TokenPair;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @Service
+@Primary
 @RequiredArgsConstructor
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 

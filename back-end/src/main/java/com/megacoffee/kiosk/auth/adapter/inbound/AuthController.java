@@ -61,7 +61,6 @@ public class AuthController {
                 .created(URI.create("/api/auth/login"))
                 .body(new BasicResponse(true, "회원가입 성공"));
     }
-
     /** 로그인 */
     @PostMapping("/auth/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest req) {
