@@ -8,9 +8,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,61 +30,39 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableWebSecurity // Lombok 어노테이션: final 필드를 생성자로 주입
-public class SecurityConfig {// 추가
+@EnableWebSecurity
+@RequiredArgsConstructor
+public class SecurityConfig {
+    private final JwtProvider jwtProvider;
 
+    // 1순위: /api/** → JWT 필터만 적용 (여전히 permitAll 또는 인증 적용)
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService(PasswordEncoder encoder) {
-        UserDetails admin = User.builder()
-                .username("admin")
-                .password(encoder.encode("secret123"))
-                .roles("USER")
-                .build();
-        return new InMemoryUserDetailsManager(admin);
-    }
-
-    @Bean
-    public SecurityFilterChain filterChain(
-            HttpSecurity http,
-            JwtProvider jwtProvider,
-            @Qualifier("customOAuth2UserService")
-            OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService,
-            OAuth2LoginSuccessHandler successHandler
-    ) throws Exception {
+    @Order(1)
+    public SecurityFilterChain apiChain(HttpSecurity http) throws Exception {
         http
+                .securityMatcher("/api/**")
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/swagger-ui.html",
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/webjars/**",
-                                "/api/register",
-                                "/api/auth/**",
-                                "/oauth2/**"
-                        ).permitAll()
-                        // 기존 허용 경로
-                        .requestMatchers("/api/register", "/auth/**", "/oauth2/**").permitAll()
+                .authorizeHttpRequests(a -> a
+                        .anyRequest().permitAll()
                 )
-                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider),
-                        UsernamePasswordAuthenticationFilter.class)
-                .oauth2Login(oauth2 -> oauth2
-                        .userInfoEndpoint(u -> u.userService(oauth2UserService))
-                        .successHandler(successHandler)
+                .addFilterBefore(
+                        new JwtAuthenticationFilter(jwtProvider),
+                        UsernamePasswordAuthenticationFilter.class
                 );
         return http.build();
     }
 
+    // 2순위: 웹 요청 전부 공개
     @Bean
-    public OAuth2LoginSuccessHandler successHandler(JwtProvider jwtProvider) {
-        return new OAuth2LoginSuccessHandler(jwtProvider);
+    @Order(2)
+    public SecurityFilterChain webChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(a -> a
+                        // 요 부분만 바뀌었습니다 ↓
+                        .anyRequest().permitAll()
+                );
+        return http.build();
     }
 }
-
-

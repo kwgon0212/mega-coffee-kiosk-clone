@@ -40,7 +40,6 @@ public class AuthController {
     private final DeleteMember deleteMember;
     private final JwtProvider jwtProvider;
     private final MemberRepository memberRepository;
-
     /** 회원가입 */
     @PostMapping("/register")
     public ResponseEntity<BasicResponse> register(@RequestBody RegisterRequest req) {
@@ -57,9 +56,7 @@ public class AuthController {
                 req.getBirth(),
                 Role.USER
         ));
-        return ResponseEntity
-                .created(URI.create("/api/auth/login"))
-                .body(new BasicResponse(true, "회원가입 성공"));
+        return ResponseEntity.ok(new BasicResponse(true, "회원가입 성공"));
     }
     /** 로그인 */
     @PostMapping("/auth/login")
