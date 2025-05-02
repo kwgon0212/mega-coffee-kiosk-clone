@@ -289,4 +289,11 @@ public class ItemService {
         // Item 삭제
         itemRepository.delete(item);
     }
+
+    public List<ItemDTO> getItemsBySubcategory(String category, String subCategory) {
+        List<Item> items = itemRepository.findByItemCategoryAndItemSubCategory(category, subCategory);
+        return items.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
 }

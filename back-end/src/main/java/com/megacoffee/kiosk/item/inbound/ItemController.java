@@ -16,12 +16,20 @@ import java.util.List;
 public class ItemController {
     private final ItemService itemService;
 
-    // /menus : 전체 메뉴 조회, /menus?category=coffee : 커피 메뉴 조회
+    // /menus : 전체 메뉴 조회, /menus?category=coffee : 커피 메뉴 조회, /menus?category=coffee&subcategory=latte : 커피에서 라떼 메뉴 조회
     @GetMapping("/menus")
-    public ResponseEntity<List<ItemDTO>> getItems(@RequestParam(required = false) String category) {
-        if (category != null) {
+    public ResponseEntity<List<ItemDTO>> getItems(
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String subcategory
+    ) {
+        if (category != null && subcategory != null) {
+            return ResponseEntity.ok(itemService.getItemsBySubcategory(category, subcategory));
+        }
+
+        else if (category != null && subcategory == null) {
             return ResponseEntity.ok(itemService.getItemsByCategory(category));
         }
+
         return ResponseEntity.ok(itemService.getAllItems());
     }
 
