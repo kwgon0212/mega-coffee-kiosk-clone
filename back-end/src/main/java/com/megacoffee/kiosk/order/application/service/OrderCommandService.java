@@ -10,11 +10,13 @@ import com.megacoffee.kiosk.order.domain.Order;
 import com.megacoffee.kiosk.order.domain.OrderStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class OrderCommandService implements CreateOrderUseCase {
 
     private final OrderRepository orderRepository;
