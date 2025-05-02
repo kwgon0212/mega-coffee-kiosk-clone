@@ -30,7 +30,7 @@ jobs:
           context: ./back-end
           file: ./back-end/Dockerfile
           push: true
-          tags: ${{ steps.login-ecr.outputs.registry }}/your-ecr-repo-name:latest
+          tags: ${{ steps.login-ecr.outputs.registry }}/web-server:latest
           platforms: linux/amd64,linux/arm64
 
       - name: Deploy on EC2 via SSH
@@ -40,6 +40,6 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd ~/your-project-folder
+            cd ~/kiosk-server
             docker-compose pull
             docker-compose up -d --build
