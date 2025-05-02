@@ -23,7 +23,7 @@ jobs:
         run: chmod +x ./back-end/gradlew
 
       - name: Build backend JAR (skip tests)
-        run: ./gradlew clean build -x test
+        run: ./gradlew clean build --refresh-dependencies -x test
         working-directory: back-end
 
       - name: Configure AWS credentials
