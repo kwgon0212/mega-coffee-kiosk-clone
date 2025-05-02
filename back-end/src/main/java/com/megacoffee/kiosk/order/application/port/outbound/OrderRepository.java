@@ -1,6 +1,7 @@
 package com.megacoffee.kiosk.order.application.port.outbound;
 
 import com.megacoffee.kiosk.order.adapter.outbound.persistence.OrderEntity;
+import com.megacoffee.kiosk.order.domain.OrderStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,4 +14,5 @@ public interface OrderRepository {
     public List<OrderEntity> findAll();
     public List<OrderEntity> findAll(UUID memberId);
     public int findMaxOrderNumber(LocalDateTime start, LocalDateTime end);
+    public OrderEntity updateState(UUID orderId, OrderStatus newStatus);
 }

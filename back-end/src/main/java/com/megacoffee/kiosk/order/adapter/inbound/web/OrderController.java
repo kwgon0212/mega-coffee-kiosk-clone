@@ -98,7 +98,7 @@ public class OrderController {
     public ResponseEntity<?> updateOrderStatus(@PathVariable UUID userId, @PathVariable UUID orderId, @RequestParam String status) {
         // 주문 상태 업데이트
         OrderStatus newStatus = OrderStatus.valueOf(status.toUpperCase());
-        OrderEntity entity = createOrderUseCase.updateState(orderId, newStatus);
+        createOrderUseCase.changeOrderStatus(orderId, newStatus);
 
         // 주문 상태 업데이트 성공 응답
         return ResponseEntity.ok(SuccessResponse.success("주문 상태 업데이트에 성공하였습니다", null));

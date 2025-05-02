@@ -9,5 +9,5 @@ import java.util.UUID;
 
 public interface CreateOrderUseCase {
     public Order createOrder(UUID userId, OrderRequestDto orderRequestDto);
-    public OrderEntity updateState(UUID orderId, OrderStatus orderStatus);
+    public void changeOrderStatus(UUID orderId, OrderStatus newStatus);
 }
