@@ -22,9 +22,9 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./back-end/gradlew
 
-      - name: Build Spring Boot App (skip tests)
-        run: ./back-end/gradlew clean build -x test
-        working-directory: ./back-end
+      - name: Build backend JAR (skip tests)
+        run: ./gradlew clean build --refresh-dependencies -x test
+        working-directory: back-end
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -54,5 +54,5 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ~/kiosk-server
-            docker-compose pull
-            docker-compose up -d --build
+            docker compose pull
+            docker compose up -d --build
