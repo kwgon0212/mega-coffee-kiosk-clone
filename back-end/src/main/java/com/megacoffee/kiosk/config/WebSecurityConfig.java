@@ -43,8 +43,9 @@ public class WebSecurityConfig {
                                 .requestMatchers( "/api/auth/kakao/callback").permitAll()
                                 .requestMatchers( "/api/**").permitAll()
                                 // 유저, 관리자 모두 가능
-//                                .requestMatchers(HttpMethod.GET, "/api/user").hasAnyRole(Role.USER.name())
-//                                .requestMatchers(HttpMethod.GET, "/api/menu/all").hasAnyRole(Role.USER.name())
+                                .requestMatchers( "/api/menu/**").hasAnyRole(Role.USER.name())
+                                .requestMatchers("/api/order/**").hasAnyRole(Role.USER.name())
+                                .requestMatchers("/api/store/**").hasAnyRole(Role.USER.name())
                                 // 유저만 가능
 //                                .requestMatchers(HttpMethod.POST, "/api/order").hasRole(Role.USER.name())
 //                                .requestMatchers(HttpMethod.GET, "/api/order/code").hasRole(Role.USER.name())
