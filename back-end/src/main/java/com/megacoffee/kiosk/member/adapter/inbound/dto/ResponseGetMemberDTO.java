@@ -18,7 +18,6 @@ public class ResponseGetMemberDTO {
     private Gender gender;
     private String phoneNumber;
     private LocalDate dateOfBirth;
-    private Role role;
 
     public static ResponseGetMemberDTO fromDomain(Member m) {
         return new ResponseGetMemberDTO(
@@ -27,8 +26,7 @@ public class ResponseGetMemberDTO {
                 m.getNickName(),
                 m.getGender(),
                 m.getPhoneNumber(),
-                m.getBirth(),
-                m.getRole()
+                m.getBirth()
         );
     }
 }

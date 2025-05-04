@@ -1,16 +1,18 @@
 package com.megacoffee.kiosk.auth.domain.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Credentials {
-    private final String account;
-    private final String secret;
-    private final OauthProvider provider;
+    String account;
+    String secret;
 
-    public Credentials(String account, String secret, OauthProvider provider){
-        this.account=account;
-        this.secret=secret;
-        this.provider=provider;
+    public static Credentials of(String account, String secret) {
+        return new Credentials(account, secret);
     }
+
 }
