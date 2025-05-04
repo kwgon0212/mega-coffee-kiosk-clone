@@ -10,5 +10,6 @@ import lombok.Setter;
 public class OptionDTO {
     private String optionName;
     private Integer optionPrice;
+    private Integer optionOrder;
     private boolean optionAvailable;
 }

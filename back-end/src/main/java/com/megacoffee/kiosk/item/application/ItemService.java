@@ -236,6 +236,7 @@ public class ItemService {
                                     OptionDTO optionDTO = new OptionDTO();
                                     optionDTO.setOptionName(option.getOptionName());
                                     optionDTO.setOptionPrice(option.getOptionPrice());
+                                    optionDTO.setOptionOrder(option.getOptionOrder());
                                     optionDTO.setOptionAvailable(option.isOptionAvailable());
                                     return optionDTO;
                                 })
