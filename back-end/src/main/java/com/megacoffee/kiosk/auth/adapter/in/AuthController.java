@@ -61,10 +61,18 @@ public class AuthController {
         );
         boolean success = true;
 
+        String accessToken = null;
+
+        if (success) {
+            accessToken = jwtUtil.generateToken(member.getId(), Role.USER);
+        }
+
+
         Map<String, Object> response = new HashMap<>();
         response.put("success", success);
         response.put("message", success ? "로그인 성공" : "로그인 실패");
         response.put("userInfo", responseLogin);
+        response.put("accessToken", accessToken);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
