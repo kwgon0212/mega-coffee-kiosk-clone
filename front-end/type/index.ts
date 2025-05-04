@@ -21,10 +21,45 @@ export interface Menu {
     shot: {
       연하게: 0;
       "샷 추가": 600;
-      "2샷 추가": 1200;
+      "2샷 추가": 12000000000000000000;
     };
   };
 }
+
+export type MenuItem = {
+  itemName: string;
+  itemMenuDetail: string;
+  itemPrice: number;
+  itemMakeTime: number;
+  itemSoldout: boolean;
+  detail: MenuItemDetail;
+  optionCategories: OptionCategory[];
+  itemImage: string;
+};
+
+export type MenuItemDetail = {
+  detailKcal: number;
+  detailNa: number;
+  detailGain: number;
+  detailSugar: number;
+  detailSatfat: number;
+  detailTransfat: number;
+  detailProtein: number;
+  detailCaffeine: number;
+};
+
+export type OptionCategory = {
+  categoryName: string;
+  categoryDescription: string;
+  categoryOrder: number;
+  options: Option[];
+};
+
+export type Option = {
+  optionName: string;
+  optionPrice: number;
+  optionAvailable: boolean;
+};
 
 export interface CartItem {
   id: number;
@@ -34,12 +69,8 @@ export interface CartItem {
   price: number;
   image: string;
   isUseTumbler: boolean;
-  options: {
-    shot?: string | null;
-    syrup?: string[];
-    sweetener?: string[];
-    topping?: string[];
-  };
+  options: {};
+  perTotalPrice: number;
 }
 
 export interface PersonalOption {
