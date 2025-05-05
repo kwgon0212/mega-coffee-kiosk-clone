@@ -31,7 +31,7 @@ public class SignupService implements SignupMember {
         UUID newId = UUID.randomUUID();
         String hashed = passwordEncoder.encode(req.getPassword());
 
-        Member member = new Member(newId, req.getName(), req.getNickName(), req.getGender(), req.getPhonenumber(), req.getBirth());
+        Member member = new Member(newId, req.getName(), req.getNickName(), req.getGender(), req.getPhoneNumber(), req.getBirth());
 
         memberRepository.save(member);
 
