@@ -14,7 +14,6 @@ public class Member {
     private final Gender gender;
     private final String phoneNumber;
     private final LocalDate birth;
-    private final Role role;
 
     // 생성자: 필수 속성만 받도록
     public Member(UUID id,
@@ -22,8 +21,7 @@ public class Member {
                   String nickName,
                   Gender gender,
                   String phoneNumber,
-                  LocalDate birth,
-                  Role role) {
+                  LocalDate birth) {
         // (유효성 검증 등 도메인 로직 수행)
         this.id       = id;
         this.name     = name;
@@ -31,7 +29,6 @@ public class Member {
         this.gender   = gender;
         this.phoneNumber = phoneNumber;
         this.birth = birth;
-        this.role     = role;
     }
 
     // 비즈니스 메서드 예: 닉네임 변경

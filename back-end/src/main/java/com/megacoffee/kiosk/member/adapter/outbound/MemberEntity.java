@@ -48,10 +48,6 @@ public class MemberEntity {
     @Column(name = "member_birth")
     private LocalDate birth;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "member_role")
-    private Role role;
-
     public Member toDomain() {
         return new Member(
                 this.memberId,
@@ -59,8 +55,7 @@ public class MemberEntity {
                 this.nickName,
                 this.gender,
                 this.phoneNumber,
-                this.birth,
-                this.role
+                this.birth
         );
     }
 
@@ -72,7 +67,6 @@ public class MemberEntity {
                 .gender(domain.getGender())
                 .phoneNumber(domain.getPhoneNumber())
                 .birth(domain.getBirth())
-                .role(domain.getRole())
                 .build();
     }
 

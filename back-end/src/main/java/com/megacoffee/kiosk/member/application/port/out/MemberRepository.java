@@ -10,5 +10,6 @@ public interface MemberRepository {
     Optional<Member> findById(UUID id);
     Member save(Member member);
     List<Member> findAll();
+    boolean existsByNickName(String nickName);
 //    Optional<Member> findByAccount(String account);
 }
