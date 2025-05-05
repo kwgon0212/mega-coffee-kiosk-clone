@@ -38,35 +38,37 @@ export default function RootLayout() {
         const accessToken = await SecureStore.getItemAsync("accessToken");
         const userInfo = await AsyncStorage.getItem("userInfo");
 
-        console.log("accessToken", accessToken);
-        console.log("path", path);
-        console.log(
-          "userInfo",
-          JSON.stringify(JSON.parse(userInfo || "{}"), null, 2)
-        );
+        const inAdminPage = segments[0] === "(admin)";
+        const inAuthPage = segments[0] === "(auth)";
 
-        const inAuthGroup = segments[0] === "(auth)";
-        const inAdminGroup = segments[0] === "(admin)";
+        // 첫화면 segments []
+        // 로그인 segments ["(auth)"]
+        // 회원가입 segments ["(auth)", signup]
+        // 스토어  segments ["(store)"]
+        // 메뉴  segments ["(menu)", "[store]"]
+        // 메뉴상세  segments ["(menu)", "[store]", "[menuId]"]
 
         if (!accessToken) {
-          if (path !== "/") router.replace("/");
+          if (segments.length > 0) router.replace("/");
           return;
         }
 
-        if (path === "/" || path === "/(auth)") {
+        if (inAuthPage) {
           router.replace("/(store)");
           return;
         }
 
-        if (inAuthGroup) {
-          if (path !== "/(store)") router.replace("/(store)");
-          return;
-        }
+        // console.log("accessToken", accessToken);
+        // console.log("path", path);
+        // console.log(
+        //   "userInfo",
+        //   JSON.stringify(JSON.parse(userInfo || "{}"), null, 2)
+        // );
 
-        if (inAdminGroup) {
-          if (path !== "/(admin)") router.replace("/(admin)");
-          return;
-        }
+        // if (inAdminPage) {
+        //   router.replace("/(admin)");
+        //   return;
+        // }
       } catch (error) {
         console.error("Auth check failed:", error);
       } finally {
@@ -75,7 +77,7 @@ export default function RootLayout() {
     };
 
     checkAuth();
-  }, [path]);
+  }, [segments]);
 
   useEffect(() => {
     if (loaded) {

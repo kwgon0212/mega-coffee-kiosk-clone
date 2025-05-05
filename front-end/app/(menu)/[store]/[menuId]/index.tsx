@@ -203,13 +203,6 @@ const MenuDetailPage = () => {
     resetState();
   };
 
-  // console.log(JSON.stringify(isUsePersonal, null, 2));
-  console.log(selectedShot);
-
-  useEffect(() => {
-    console.log("optionState 변경됨:", JSON.stringify(optionState, null, 2));
-  }, [optionState]);
-
   if (isLoading || !menu) {
     return (
       <Layout
