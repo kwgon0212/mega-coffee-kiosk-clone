@@ -34,8 +34,13 @@ const MenuDetailPage = () => {
   const [isOpenPersonalAccordion, setIsOpenPersonalAccordion] = useState(false);
 
   const [isUseTumbler, setIsUseTumbler] = useState(false);
-  const [isUsePersonal, setIsUsePersonal] = useState<any>({});
+  const [isUsePersonal, setIsUsePersonal] = useState<Record<string, boolean>>(
+    {}
+  );
   const [selectedShot, setSelectedShot] = useState<string | null>(null);
+
+  const [optionState, setOptionState] = useState<Record<string, boolean>>({});
+
   const [totalPrice, setTotalPrice] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
@@ -44,7 +49,6 @@ const MenuDetailPage = () => {
       `${process.env.EXPO_PUBLIC_BASE_URL}/api/menus/item/${menuId}`
     );
     const data = await response.json();
-    console.log(JSON.stringify(data, null, 2));
     return data;
   };
 
@@ -61,12 +65,12 @@ const MenuDetailPage = () => {
   useEffect(() => {
     if (menu) {
       setIsUsePersonal(
-        menu.optionCategories.map((category) =>
-          category.options.reduce((acc, option) => {
+        menu.optionCategories.reduce((acc, category) => {
+          category.options.forEach((option) => {
             acc[option.optionName] = false;
-            return acc;
-          }, {} as Record<string, boolean>)
-        )
+          });
+          return acc;
+        }, {} as Record<string, boolean>)
       );
       setTotalPrice(menu.itemPrice);
       setSelectedShot(null);
@@ -118,7 +122,7 @@ const MenuDetailPage = () => {
       } else {
         // 다른 카테고리는 기존 로직대로 처리
         category.options.forEach((option) => {
-          if (isUsePersonal[catIdx]?.[option.optionName]) {
+          if (optionState[option.optionName]) {
             price += option.optionPrice;
           }
         });
@@ -133,12 +137,25 @@ const MenuDetailPage = () => {
     menu,
     cupCategory,
     otherCategories,
+    optionState,
   ]);
 
   const resetState = () => {
+    if (!menu) return;
+
     setIsUseTumbler(false);
-    setIsUsePersonal({});
+    setIsUsePersonal(
+      menu.optionCategories.reduce((acc, category) => {
+        category.options.forEach((option) => {
+          acc[option.optionName] = false;
+        });
+        return acc;
+      }, {} as Record<string, boolean>)
+    );
+    setOptionState({});
+    setSelectedShot(null);
     setQuantity(1);
+    setTotalPrice(0);
     setIsOpenCupAccordion(false);
     setIsOpenPersonalAccordion(false);
     setIsOpenInfoModal(false);
@@ -154,13 +171,15 @@ const MenuDetailPage = () => {
       quantity,
       image: menu.itemImage || "",
       isUseTumbler,
-      options: isUsePersonal,
+      selectedShot,
+      options: optionState,
       price: menu.itemPrice,
       perTotalPrice: totalPrice,
+      createdCartItemAt: new Date(),
     };
     addToCart(cartItem);
-    router.push("/cart");
     resetState();
+    router.push("/cart");
   };
 
   const handleAddToCart = () => {
@@ -174,13 +193,22 @@ const MenuDetailPage = () => {
       quantity,
       image: menu.itemImage || "",
       isUseTumbler,
-      options: isUsePersonal,
+      selectedShot,
+      options: optionState,
       price: menu.itemPrice,
       perTotalPrice: totalPrice,
+      createdCartItemAt: new Date(),
     };
     addToCart(cartItem);
     resetState();
   };
+
+  // console.log(JSON.stringify(isUsePersonal, null, 2));
+  console.log(selectedShot);
+
+  useEffect(() => {
+    console.log("optionState 변경됨:", JSON.stringify(optionState, null, 2));
+  }, [optionState]);
 
   if (isLoading || !menu) {
     return (
@@ -288,17 +316,16 @@ const MenuDetailPage = () => {
                         option.optionName +
                         `${!option.optionAvailable ? " [품절]" : ""}`
                       }
-                      isChecked={
-                        isUsePersonal[catIdx]?.[option.optionName] || false
-                      }
+                      isChecked={optionState[option.optionName] || false}
                       disabled={!option.optionAvailable}
                       setIsChecked={(isChecked) =>
-                        setIsUsePersonal((prev: any) => {
-                          const newArr = [...prev];
-                          const newObj = { ...newArr[catIdx] };
-                          newObj[option.optionName] = isChecked;
-                          newArr[catIdx] = newObj;
-                          return newArr;
+                        setOptionState((prev: any) => {
+                          if (isChecked) {
+                            return { ...prev, [option.optionName]: true };
+                          } else {
+                            const { [option.optionName]: _, ...rest } = prev;
+                            return rest;
+                          }
                         })
                       }
                     />

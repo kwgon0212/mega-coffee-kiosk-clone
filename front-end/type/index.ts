@@ -69,8 +69,10 @@ export interface CartItem {
   price: number;
   image: string;
   isUseTumbler: boolean;
-  options: {};
+  selectedShot: string | null;
+  options: Record<string, boolean>;
   perTotalPrice: number;
+  createdCartItemAt: Date;
 }
 
 export interface PersonalOption {

@@ -8,7 +8,7 @@ type CartStore = {
   count: number;
   addToCart: (item: CartItem) => void;
   removeFromCart: (itemId: number) => void;
-  setQuantity: (itemId: number, quantity: number) => void;
+  setQuantity: (createdCartItemAt: Date, quantity: number) => void;
   clearCart: () => void;
 };
 
@@ -27,10 +27,12 @@ export const useCartStore = create<CartStore>()(
         cart: state.cart.filter((item) => item.id !== itemId),
         count: state.count - 1,
       })),
-    setQuantity: (itemId: number, quantity: number) =>
+    setQuantity: (createdCartItemAt: Date, quantity: number) =>
       set((state) => ({
         cart: state.cart.map((item) =>
-          item.id === itemId ? { ...item, quantity } : item
+          item.createdCartItemAt === createdCartItemAt
+            ? { ...item, quantity }
+            : item
         ),
       })),
     clearCart: () => set({ cart: [], count: 0 }),
