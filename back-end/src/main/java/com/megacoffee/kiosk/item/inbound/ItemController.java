@@ -5,6 +5,7 @@ import com.megacoffee.kiosk.item.dto.ItemDetailDTO;
 import com.megacoffee.kiosk.item.dto.ItemDTO;
 import com.megacoffee.kiosk.item.dto.MenuCreateRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,23 +42,26 @@ public class ItemController {
     }
 
     // 메뉴 추가
-    @PostMapping("/admin/addMenus")
-    public ResponseEntity<ItemDetailDTO> addMenu(@RequestBody MenuCreateRequest request) {
+    @PostMapping(value = "/admin/addMenus", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ItemDetailDTO> addMenu(@ModelAttribute MenuCreateRequest request) {
         ItemDetailDTO createdMenu = itemService.createMenu(request);
         return ResponseEntity.ok(createdMenu);
     }
+
     // 메뉴 수정
     @PostMapping("/admin/editMenus/{itemId}")
     public ResponseEntity<ItemDetailDTO> editMenu(@PathVariable Long itemId, @RequestBody MenuCreateRequest request) {
         ItemDetailDTO updatedMenu = itemService.updateMenu(itemId, request);
         return ResponseEntity.ok(updatedMenu);
     }
+
     // 메뉴 품절 전환
     @PostMapping("/admin/editMenus/{itemId}/soldout")
     public ResponseEntity<ItemDetailDTO> toggleSoldout(@PathVariable Long itemId) {
         ItemDetailDTO updatedMenu = itemService.toggleSoldout(itemId);
         return ResponseEntity.ok(updatedMenu);
     }
+
     // 메뉴 삭제
     @DeleteMapping("/admin/deleteMenus/{itemId}")
     public ResponseEntity<Void> deleteMenu(@PathVariable Long itemId) {
