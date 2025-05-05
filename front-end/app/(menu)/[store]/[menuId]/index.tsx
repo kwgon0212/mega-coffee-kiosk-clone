@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -17,16 +17,10 @@ import Button from "@/components/Button";
 import { useCartStore } from "@/store/useCartStore";
 import Toast from "react-native-toast-message";
 import recommendMenu from "@/assets/mock/recommendedMenu";
-import { CartItem, Menu } from "@/type";
+import { CartItem, Menu, MenuItem } from "@/type";
 import Accordion from "@/components/Accordion";
 import Checkbox from "@/components/Checkbox";
-
-interface PersonalOption {
-  shot: "연하게" | "샷추가" | "2샷 추가" | null;
-  syrup: string[];
-  sweetener: string[];
-  topping: string[];
-}
+import { useQuery } from "@tanstack/react-query";
 
 const MenuDetailPage = () => {
   const { menuId, store } = useLocalSearchParams() as {
@@ -35,75 +29,133 @@ const MenuDetailPage = () => {
   };
   const { addToCart } = useCartStore();
 
-  const [menu, setMenu] = useState<Menu | null>(null);
   const [isOpenInfoModal, setIsOpenInfoModal] = useState(false);
   const [isOpenCupAccordion, setIsOpenCupAccordion] = useState(false);
   const [isOpenPersonalAccordion, setIsOpenPersonalAccordion] = useState(false);
 
   const [isUseTumbler, setIsUseTumbler] = useState(false);
-  const [isUsePersonal, setIsUsePersonal] = useState<PersonalOption>({
-    shot: null,
-    syrup: [],
-    sweetener: [],
-    topping: [],
-  });
+  const [isUsePersonal, setIsUsePersonal] = useState<Record<string, boolean>>(
+    {}
+  );
+  const [selectedShot, setSelectedShot] = useState<string | null>(null);
+
+  const [optionState, setOptionState] = useState<Record<string, boolean>>({});
+
+  const [totalPrice, setTotalPrice] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
-  useEffect(() => {
-    const fetchMenuData = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.EXPO_PUBLIC_BASE_URL}/menus?id=${menuId}`
-        );
-
-        if (!response.ok) {
-          router.back();
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setMenu(data[0]);
-      } catch (error) {
-        router.back();
-        console.error("데이터를 가져오는 중 오류 발생:", error);
-      }
-    };
-
-    fetchMenuData();
-  }, [menuId, store]);
-
-  const totalPrice = menu
-    ? menu.price +
-      (isUsePersonal.shot === "샷추가" ? 600 : 0) +
-      (isUsePersonal.shot === "2샷 추가" ? 1200 : 0) +
-      isUsePersonal.syrup.length * 700 +
-      isUsePersonal.sweetener.length * 1000 +
-      isUsePersonal.topping.length * 700
-    : 0;
-
-  const togglePersonalArray = (
-    key: "sweetener" | "topping" | "syrup",
-    value: string
-  ) => {
-    setIsUsePersonal((prev) => {
-      const arr = prev[key] || [];
-      if (arr.includes(value)) {
-        return { ...prev, [key]: arr.filter((v) => v !== value) };
-      } else {
-        return { ...prev, [key]: [...arr, value] };
-      }
-    });
+  const fetchMenuData = async () => {
+    const response = await fetch(
+      `${process.env.EXPO_PUBLIC_BASE_URL}/api/menus/item/${menuId}`
+    );
+    const data = await response.json();
+    return data;
   };
 
-  const resetState = () => {
-    setIsUseTumbler(false);
-    setIsUsePersonal({
-      shot: null,
-      syrup: [],
-      sweetener: [],
-      topping: [],
+  const {
+    data: menu,
+    isLoading,
+    error,
+  } = useQuery<MenuItem>({
+    queryKey: ["menu", menuId],
+    queryFn: () => fetchMenuData(),
+  });
+
+  // 옵션 선택 상태 초기화
+  useEffect(() => {
+    if (menu) {
+      setIsUsePersonal(
+        menu.optionCategories.reduce((acc, category) => {
+          category.options.forEach((option) => {
+            acc[option.optionName] = false;
+          });
+          return acc;
+        }, {} as Record<string, boolean>)
+      );
+      setTotalPrice(menu.itemPrice);
+      setSelectedShot(null);
+    }
+  }, [menu]);
+
+  const cupCategory = useMemo(
+    () =>
+      menu?.optionCategories.find(
+        (category) => category.categoryName === "컵 선택"
+      ),
+    [menu]
+  );
+
+  const otherCategories = useMemo(
+    () =>
+      menu?.optionCategories.filter(
+        (category) => category.categoryName !== "컵 선택"
+      ),
+    [menu]
+  );
+
+  // 가격 계산
+  useEffect(() => {
+    if (!menu) return;
+
+    let price = menu.itemPrice;
+
+    // 컵 선택 옵션 가격
+    if (cupCategory && isUseTumbler) {
+      const cupOption = cupCategory.options[0];
+      if (cupOption && cupOption.optionPrice) {
+        price += cupOption.optionPrice;
+      }
+    }
+
+    // 나머지 옵션 가격
+    otherCategories?.forEach((category, catIdx) => {
+      if (category.categoryName === "샷 선택") {
+        // 샷 선택 카테고리의 경우 선택된 옵션만 가격 추가
+        if (selectedShot) {
+          const selectedOption = category.options.find(
+            (opt) => opt.optionName === selectedShot
+          );
+          if (selectedOption && selectedOption.optionPrice) {
+            price += selectedOption.optionPrice;
+          }
+        }
+      } else {
+        // 다른 카테고리는 기존 로직대로 처리
+        category.options.forEach((option) => {
+          if (optionState[option.optionName]) {
+            price += option.optionPrice;
+          }
+        });
+      }
     });
+
+    setTotalPrice(price);
+  }, [
+    isUseTumbler,
+    isUsePersonal,
+    selectedShot,
+    menu,
+    cupCategory,
+    otherCategories,
+    optionState,
+  ]);
+
+  const resetState = () => {
+    if (!menu) return;
+
+    setIsUseTumbler(false);
+    setIsUsePersonal(
+      menu.optionCategories.reduce((acc, category) => {
+        category.options.forEach((option) => {
+          acc[option.optionName] = false;
+        });
+        return acc;
+      }, {} as Record<string, boolean>)
+    );
+    setOptionState({});
+    setSelectedShot(null);
     setQuantity(1);
+    setTotalPrice(0);
     setIsOpenCupAccordion(false);
     setIsOpenPersonalAccordion(false);
     setIsOpenInfoModal(false);
@@ -113,18 +165,21 @@ const MenuDetailPage = () => {
     if (!menu) return;
 
     const cartItem: CartItem = {
-      id: menu.id,
+      id: Number(menuId),
       store,
-      name: menu.name,
+      name: menu.itemName,
       quantity,
-      price: menu.price,
-      image: menu.image,
+      image: menu.itemImage || "",
       isUseTumbler,
-      options: { ...isUsePersonal },
+      selectedShot,
+      options: optionState,
+      price: menu.itemPrice,
+      perTotalPrice: totalPrice,
+      createdCartItemAt: new Date(),
     };
     addToCart(cartItem);
-    router.push("/cart");
     resetState();
+    router.push("/cart");
   };
 
   const handleAddToCart = () => {
@@ -132,20 +187,30 @@ const MenuDetailPage = () => {
 
     Toast.show({ type: "successAddCart" });
     const cartItem: CartItem = {
-      id: menu.id,
+      id: Number(menuId),
       store,
-      name: menu.name,
+      name: menu.itemName,
       quantity,
-      price: menu.price,
-      image: menu.image,
+      image: menu.itemImage || "",
       isUseTumbler,
-      options: { ...isUsePersonal },
+      selectedShot,
+      options: optionState,
+      price: menu.itemPrice,
+      perTotalPrice: totalPrice,
+      createdCartItemAt: new Date(),
     };
     addToCart(cartItem);
     resetState();
   };
 
-  if (!menu)
+  // console.log(JSON.stringify(isUsePersonal, null, 2));
+  console.log(selectedShot);
+
+  useEffect(() => {
+    console.log("optionState 변경됨:", JSON.stringify(optionState, null, 2));
+  }, [optionState]);
+
+  if (isLoading || !menu) {
     return (
       <Layout
         style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
@@ -153,6 +218,17 @@ const MenuDetailPage = () => {
         <Text>메뉴 정보를 불러오는 중입니다.</Text>
       </Layout>
     );
+  }
+
+  if (error) {
+    return (
+      <Layout
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      >
+        <Text>메뉴 정보를 불러오는 중 오류가 발생했습니다.</Text>
+      </Layout>
+    );
+  }
 
   return (
     <ScrollView bounces={false}>
@@ -162,7 +238,7 @@ const MenuDetailPage = () => {
           onPress={() => setIsOpenInfoModal(true)}
         >
           <View>
-            <Image source={{ uri: menu?.image }} style={styles.image} />
+            {/* <Image source={{ uri: menu.itemImage }} style={styles.image} /> */}
             <MaterialCommunityIcons
               style={{
                 position: "absolute",
@@ -177,10 +253,9 @@ const MenuDetailPage = () => {
               color="white"
             />
           </View>
-          <Text style={styles.name}>{menu?.name}</Text>
-          <Text style={styles.description}>{menu?.description}</Text>
+          <Text style={styles.name}>{menu.itemName}</Text>
+          <Text style={styles.description}>{menu.itemMenuDetail}</Text>
         </Pressable>
-
         <Pressable
           style={styles.infoContainer}
           onPress={() => setIsOpenInfoModal(true)}
@@ -189,22 +264,24 @@ const MenuDetailPage = () => {
           <Entypo name="chevron-thin-right" size={20} color="black" />
         </Pressable>
 
-        <Accordion
-          isOpen={isOpenCupAccordion}
-          setIsOpen={setIsOpenCupAccordion}
-          title="컵 선택"
-        >
-          <View style={styles.cupContainer}>
-            <Text style={{ fontSize: 16, fontWeight: "500" }}>
-              개인 텀블러 사용
-            </Text>
-            <Checkbox
-              label="텀블러(개인컵) 사용"
-              isChecked={isUseTumbler}
-              setIsChecked={setIsUseTumbler}
-            />
-          </View>
-        </Accordion>
+        {cupCategory && (
+          <Accordion
+            isOpen={isOpenCupAccordion}
+            setIsOpen={setIsOpenCupAccordion}
+            title="컵 선택"
+          >
+            <View style={styles.cupContainer}>
+              <Text style={{ fontSize: 16, fontWeight: "500" }}>
+                {cupCategory.options[0]?.optionName}
+              </Text>
+              <Checkbox
+                label={cupCategory.options[0]?.optionName}
+                isChecked={isUseTumbler}
+                setIsChecked={setIsUseTumbler}
+              />
+            </View>
+          </Accordion>
+        )}
 
         <Accordion
           isOpen={isOpenPersonalAccordion}
@@ -212,103 +289,52 @@ const MenuDetailPage = () => {
           title="퍼스널 옵션"
         >
           <View style={styles.cupContainer}>
-            <Text style={{ fontSize: 18, fontWeight: "500" }}>샷선택</Text>
-            <Checkbox
-              label="연하게"
-              isChecked={isUsePersonal.shot === "연하게"}
-              setIsChecked={() =>
-                setIsUsePersonal((prev) => ({
-                  ...prev,
-                  shot: prev.shot === "연하게" ? null : "연하게",
-                }))
-              }
-            />
-            <Checkbox
-              label="샷추가 +600원"
-              isChecked={isUsePersonal.shot === "샷추가"}
-              setIsChecked={() =>
-                setIsUsePersonal((prev) => ({
-                  ...prev,
-                  shot: prev.shot === "샷추가" ? null : "샷추가",
-                }))
-              }
-            />
-            <Checkbox
-              label="2샷 추가 +1,200원"
-              isChecked={isUsePersonal.shot === "2샷 추가"}
-              setIsChecked={() =>
-                setIsUsePersonal((prev) => ({
-                  ...prev,
-                  shot: prev.shot === "2샷 추가" ? null : "2샷 추가",
-                }))
-              }
-            />
-            <Text style={{ fontSize: 18, fontWeight: "500" }}>당도 선택</Text>
-            <Checkbox
-              label="바닐라시럽추가 +700원"
-              isChecked={isUsePersonal.sweetener?.includes("바닐라시럽추가")}
-              setIsChecked={() =>
-                togglePersonalArray("syrup", "바닐라시럽추가")
-              }
-            />
-            <Checkbox
-              label="카라멜시럽추가 +700원"
-              isChecked={isUsePersonal.sweetener?.includes("카라멜시럽추가")}
-              setIsChecked={() =>
-                togglePersonalArray("syrup", "카라멜시럽추가")
-              }
-            />
-            <Checkbox
-              label="헤이즐넛시럽추가 +700원"
-              isChecked={isUsePersonal.sweetener?.includes("헤이즐넛시럽추가")}
-              setIsChecked={() =>
-                togglePersonalArray("syrup", "헤이즐넛시럽추가")
-              }
-            />
-            <Checkbox
-              label="라이트바닐라시럽추가 +1,000원"
-              isChecked={isUsePersonal.sweetener?.includes(
-                "라이트바닐라시럽추가"
-              )}
-              setIsChecked={() =>
-                togglePersonalArray("sweetener", "라이트바닐라시럽추가")
-              }
-            />
-            <Checkbox
-              label="연유 추가 +1,000원"
-              isChecked={isUsePersonal.sweetener?.includes("연유 추가")}
-              setIsChecked={() => togglePersonalArray("sweetener", "연유 추가")}
-            />
-            <Checkbox
-              label="꿀 추가 +1,000원"
-              isChecked={isUsePersonal.sweetener?.includes("꿀 추가")}
-              setIsChecked={() => togglePersonalArray("sweetener", "꿀 추가")}
-            />
-            <Checkbox
-              label="저당 스테비아 추가 +800원"
-              isChecked={isUsePersonal.sweetener?.includes(
-                "저당 스테비아 추가"
-              )}
-              setIsChecked={() =>
-                togglePersonalArray("sweetener", "저당 스테비아 추가")
-              }
-            />
-            <Text style={{ fontSize: 18, fontWeight: "500" }}>토핑 선택</Text>
-            <Checkbox
-              label="휘핑추가 +700원"
-              isChecked={isUsePersonal.topping?.includes("휘핑추가")}
-              setIsChecked={() => togglePersonalArray("topping", "휘핑추가")}
-            />
-            <Checkbox
-              label="타피오카펄추가 +700원"
-              isChecked={isUsePersonal.topping?.includes("타피오카펄추가")}
-              setIsChecked={() =>
-                togglePersonalArray("topping", "타피오카펄추가")
-              }
-            />
+            {otherCategories?.map((category, catIdx) => (
+              <View key={category.categoryName}>
+                <Text style={{ fontSize: 18, fontWeight: "500" }}>
+                  {category.categoryName}
+                </Text>
+                {category.options.map((option) =>
+                  category.categoryName === "샷 선택" ? (
+                    <Checkbox
+                      key={option.optionName}
+                      label={option.optionName}
+                      isChecked={selectedShot === option.optionName}
+                      disabled={!option.optionAvailable}
+                      setIsChecked={(isChecked) => {
+                        if (isChecked) {
+                          setSelectedShot(option.optionName);
+                        } else {
+                          setSelectedShot(null);
+                        }
+                      }}
+                    />
+                  ) : (
+                    <Checkbox
+                      key={option.optionName}
+                      label={
+                        option.optionName +
+                        `${!option.optionAvailable ? " [품절]" : ""}`
+                      }
+                      isChecked={optionState[option.optionName] || false}
+                      disabled={!option.optionAvailable}
+                      setIsChecked={(isChecked) =>
+                        setOptionState((prev: any) => {
+                          if (isChecked) {
+                            return { ...prev, [option.optionName]: true };
+                          } else {
+                            const { [option.optionName]: _, ...rest } = prev;
+                            return rest;
+                          }
+                        })
+                      }
+                    />
+                  )
+                )}
+              </View>
+            ))}
           </View>
         </Accordion>
-
         <View style={styles.orderContainer}>
           <View style={styles.amountContainer}>
             <Pressable onPress={() => setQuantity(quantity - 1)}>
@@ -323,7 +349,6 @@ const MenuDetailPage = () => {
             {(totalPrice * quantity).toLocaleString()}
           </Text>
         </View>
-
         <View style={styles.recommendContainer}>
           <Text style={{ fontSize: 18, fontWeight: "bold" }}>추천 메뉴</Text>
           <View style={styles.recommendMenuContainer}>
@@ -352,14 +377,12 @@ const MenuDetailPage = () => {
             ))}
           </View>
         </View>
-
         <View style={styles.totalPriceContainer}>
           <Text style={{ fontSize: 18, fontWeight: "500" }}>상품금액</Text>
           <Text style={{ fontSize: 20, fontWeight: "500", color: "red" }}>
             {(totalPrice * quantity).toLocaleString()} 원
           </Text>
         </View>
-
         <View style={styles.orderButtonContainer}>
           <Button
             text="바로 주문"
@@ -382,7 +405,7 @@ const MenuDetailPage = () => {
         <InfoModal
           isOpen={isOpenInfoModal}
           setIsOpen={setIsOpenInfoModal}
-          info={menu.info}
+          info={menu.detail}
         />
       )}
     </ScrollView>

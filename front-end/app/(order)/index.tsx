@@ -11,6 +11,7 @@ import {
   TextInput,
   Pressable,
   ScrollView,
+  Image,
 } from "react-native";
 import BottomSheet from "./BottomSheet";
 import { useCartStore } from "@/store/useCartStore";
@@ -19,7 +20,7 @@ import { router } from "expo-router";
 const CouponBottomSheet = BottomSheet;
 
 const OrderPage = () => {
-  const { cart } = useCartStore();
+  const { cart, clearCart } = useCartStore();
   const [isOpenOrderProducts, setIsOpenOrderProducts] = useState(false);
   const [isOpenOrderNotice, setIsOpenOrderNotice] = useState(false);
   const [storeRequest, setStoreRequest] = useState("");
@@ -28,13 +29,44 @@ const OrderPage = () => {
   const [isOpenCouponModal, setIsOpenCouponModal] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("메가선불카드");
 
-  const handlePay = () => {
+  const totalPrice = cart.reduce(
+    (acc, item) => acc + item.perTotalPrice * item.quantity,
+    0
+  );
+
+  const handlePay = async () => {
     console.log("storeRequest", storeRequest);
     console.log("isTakeout", isTakeout);
     console.log("packageOption", packageOption);
     console.log("paymentMethod", paymentMethod);
-    console.log("cart", cart);
-    router.push("/(order)/list/123");
+    console.log("cart", JSON.stringify(cart, null, 2));
+
+    const response = await fetch(
+      `${process.env.EXPO_PUBLIC_BASE_URL}/api/orders/123`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          discount_price: 0,
+          is_take_out: isTakeout,
+          item_make_time: 5,
+          member_id: 123,
+          nickname: "test",
+          order_count: 1,
+          order_date: new Date(),
+          package_option: packageOption,
+          payment_method: paymentMethod,
+          request_message: storeRequest,
+          store_name: cart[0].store,
+          total_price: totalPrice,
+        }),
+      }
+    );
+    const data = await response.json();
+    console.log("success", data.success);
+    console.log("message", data.message);
+    console.log("orderNumber", data.orderNumber);
+    // clearCart();
+    // router.push("/(order)/list/123");
   };
 
   return (
@@ -49,7 +81,37 @@ const OrderPage = () => {
           setIsOpen={setIsOpenOrderProducts}
           title="주문 상품"
         >
-          <View style={styles.orderProducts}></View>
+          <View style={styles.orderProducts}>
+            {cart.map((item, idx) => (
+              <View
+                key={`${item.id.toString()}-${JSON.stringify(item.options)}-${
+                  item.quantity
+                }-${item.isUseTumbler}`}
+                style={styles.cartListCard}
+              >
+                <Image
+                  source={{ uri: item.image }}
+                  style={styles.cartListImage}
+                />
+                <View style={styles.cartListCardInfo}>
+                  <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                    {item.name}
+                  </Text>
+                  <View style={{ gap: 5 }}>
+                    {item.isUseTumbler && <Text>텀블러(개인컵) 사용</Text>}
+                    {item.selectedShot !== null && (
+                      <Text>{item.selectedShot}</Text>
+                    )}
+                    {Object.entries(item.options)
+                      .filter(([_, value]) => value === true)
+                      .map(([key]) => (
+                        <Text key={key}>{key}</Text>
+                      ))}
+                  </View>
+                </View>
+              </View>
+            ))}
+          </View>
         </Accordion>
 
         <View style={{ gap: 20, padding: 20 }}>
@@ -174,7 +236,7 @@ const OrderPage = () => {
         <View style={{ paddingHorizontal: 20, gap: 10 }}>
           <View style={styles.priceContainer}>
             <Text style={styles.subtitle}>상품금액</Text>
-            <Text style={styles.price}>{Number(3000).toLocaleString()}원</Text>
+            <Text style={styles.price}>{totalPrice.toLocaleString()}원</Text>
           </View>
 
           <View style={styles.priceContainer}>
@@ -185,7 +247,7 @@ const OrderPage = () => {
           <View style={styles.priceContainer}>
             <Text style={styles.subtitle}>결제금액</Text>
             <Text style={[styles.price, { color: "red", fontWeight: "bold" }]}>
-              {Number(3000).toLocaleString()}원
+              {totalPrice.toLocaleString()}원
             </Text>
           </View>
         </View>
@@ -329,6 +391,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  cartListCard: {
+    position: "relative",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 20,
+  },
+  cartListImage: {
+    width: 100,
+    height: 100,
+    borderRadius: "100%",
+  },
+  cartListCardInfo: {
+    flex: 1,
+    gap: 10,
   },
 });
 

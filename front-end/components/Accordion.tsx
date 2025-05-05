@@ -7,6 +7,7 @@ interface AccordionProps {
   children: React.ReactNode;
   title: string;
   subtitle?: string;
+  isStyled?: boolean;
 }
 
 const Accordion = ({
@@ -15,9 +16,18 @@ const Accordion = ({
   children,
   title,
   subtitle,
+  isStyled,
 }: AccordionProps) => {
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        isStyled && {
+          boxShadow: "0px 1px 5px 0px rgba(0, 0, 0, 0.2)",
+          borderRadius: 10,
+        },
+      ]}
+    >
       <Pressable onPress={() => setIsOpen(!isOpen)} style={styles.header}>
         <Text style={styles.headerText}>{title}</Text>
         <View style={styles.headerRight}>
@@ -38,8 +48,6 @@ const Accordion = ({
 const styles = StyleSheet.create({
   container: {
     overflow: "hidden",
-    boxShadow: "0px 1px 5px 0px rgba(0, 0, 0, 0.2)",
-    borderRadius: 10,
   },
   header: {
     flexDirection: "row",

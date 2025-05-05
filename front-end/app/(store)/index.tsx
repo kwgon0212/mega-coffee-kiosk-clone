@@ -27,7 +27,10 @@ const StorePage = () => {
 
   useEffect(() => {
     const fetchStoreList = async () => {
-      const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/store`);
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_TEST_SERVER}/store`
+      );
+      // const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/api/store`);
       const data = await response.json();
       setStoreList(data);
     };
@@ -63,7 +66,6 @@ const StorePage = () => {
                 address={`${store.address.city} ${store.address.street} ${store.address.detail}`}
                 distance={store.distance}
                 onPress={() => {
-                  // router.push(`/(menu)/${store.name}`);
                   setIsOpenStoreModal(true);
                   setSelectedStore(store);
                 }}

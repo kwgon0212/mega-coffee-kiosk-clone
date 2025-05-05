@@ -5,52 +5,127 @@ import HeaderOptions from "@/components/HeaderOptions";
 import MenuCard from "../MenuCard";
 import CartButton from "@/components/CartButton";
 import { Menu } from "@/type";
+import { useQuery } from "@tanstack/react-query";
+import Layout from "@/components/ui/Layout";
+
+interface MenuList {
+  itemId: number;
+  itemName: string;
+  itemPrice: number;
+  itemSoldout: boolean;
+  itemCategory: string;
+  itemSubCategory: string;
+  itemImage: string;
+}
 
 export default function StoreMenu() {
   const { store } = useLocalSearchParams<{ store: string }>();
-  const [selectedOption, setSelectedOption] = useState("new");
+  const [selectedCategory, setSelectedCategory] = useState("coffee");
+  const [selectedSubCategory, setSelectedSubCategory] = useState("espresso");
+  const [filteredMenuList, setFilteredMenuList] = useState<MenuList[]>([]);
   const [filter, setFilter] = useState(1);
-  const [menuList, setMenuList] = useState<Menu[]>([]);
+
+  const fetchMenuCategoryData = async (
+    category: string
+  ): Promise<MenuList[]> => {
+    const response = await fetch(
+      `${process.env.EXPO_PUBLIC_BASE_URL}/api/menus?category=${category}`
+    );
+    const data = await response.json();
+    return data;
+  };
+
+  const getSubCategory = (menuList: MenuList[]) => {
+    return [...new Set(menuList.map((menu) => menu.itemSubCategory))];
+  };
+
+  const getFilteredMenuList = (menuList: MenuList[], subCategory: string) => {
+    return menuList.filter((menu) => menu.itemSubCategory === subCategory);
+  };
+
+  const {
+    data: menuList,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["menuList", selectedCategory],
+    queryFn: () => fetchMenuCategoryData(selectedCategory),
+  });
 
   useEffect(() => {
-    const fetchMenuAllData = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.EXPO_PUBLIC_BASE_URL}/menus`
-        );
+    if (menuList) {
+      setFilteredMenuList(getFilteredMenuList(menuList, selectedSubCategory));
+    }
+  }, [menuList, selectedSubCategory]);
 
-        if (!response.ok) {
-          router.back();
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+  useEffect(() => {
+    if (menuList) {
+      setSelectedSubCategory(getSubCategory(menuList)[0]);
+    }
+  }, [menuList]);
 
-        const data = await response.json();
-        setMenuList(data);
-      } catch (error) {
-        router.back();
-        console.error("데이터를 가져오는 중 오류 발생:", error);
-      }
-    };
+  if (isLoading)
+    return (
+      <Layout
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      >
+        <Text>Loading...</Text>
+      </Layout>
+    );
 
-    fetchMenuAllData();
-  }, []);
+  if (error)
+    return (
+      <Layout
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      >
+        <Text>Error: {error.message}</Text>
+      </Layout>
+    );
+
+  if (!menuList) return null;
 
   return (
-    <View style={styles.container}>
+    <Layout>
       <HeaderOptions
-        selectedOption={selectedOption}
-        onSelect={setSelectedOption}
+        selectedOption={selectedCategory}
+        onSelect={setSelectedCategory}
         options={[
-          { id: "new", label: "신메뉴" },
-          { id: "recommend", label: "추천메뉴" },
           { id: "coffee", label: "커피" },
           { id: "decaf", label: "디카페인" },
           { id: "drink", label: "음료" },
           { id: "tea", label: "티" },
-          { id: "food", label: "푸드" },
-          { id: "product", label: "상품" },
         ]}
       />
+
+      <View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.subCategoryContainer}
+        >
+          {getSubCategory(menuList).map((subCategory) => (
+            <Pressable
+              key={subCategory}
+              style={[
+                styles.subCategoryButton,
+                selectedSubCategory === subCategory &&
+                  styles.selectedSubCategory,
+              ]}
+              onPress={() => setSelectedSubCategory(subCategory)}
+            >
+              <Text
+                style={[
+                  styles.subCategoryText,
+                  selectedSubCategory === subCategory &&
+                    styles.selectedSubCategory,
+                ]}
+              >
+                {subCategory}
+              </Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </View>
 
       <View style={styles.mainContainer}>
         <View style={styles.filter}>
@@ -71,13 +146,13 @@ export default function StoreMenu() {
             }}
             showsVerticalScrollIndicator={false}
           >
-            {menuList.map((menu) => (
+            {filteredMenuList.map((menu) => (
               <MenuCard
-                key={menu.name}
+                key={menu.itemId + menu.itemName}
                 menu={menu}
                 filter={filter === 1 ? 3 : 1}
                 onPress={() => {
-                  router.push(`/(menu)/${store}/${menu.id}`);
+                  router.push(`/(menu)/${store}/${menu.itemId}`);
                 }}
               />
             ))}
@@ -89,7 +164,7 @@ export default function StoreMenu() {
         <Text style={styles.footerText}>{store}</Text>
         <CartButton color="white" />
       </View>
-    </View>
+    </Layout>
   );
 }
 
@@ -130,5 +205,27 @@ const styles = StyleSheet.create({
   },
   filterText: {
     fontSize: 18,
+  },
+  subCategoryContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    gap: 10,
+  },
+  subCategoryButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderWidth: 1,
+    borderColor: "gray",
+    borderRadius: 999,
+  },
+  selectedSubCategory: {
+    backgroundColor: "black",
+    color: "white",
+  },
+  subCategoryText: {
+    color: "black",
+    fontSize: 16,
   },
 });

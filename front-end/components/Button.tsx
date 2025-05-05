@@ -5,6 +5,7 @@ import {
   Text,
   StyleProp,
   ViewStyle,
+  DimensionValue,
 } from "react-native";
 
 interface ButtonProps {
@@ -13,6 +14,7 @@ interface ButtonProps {
   backgroundColor?: string;
   color?: string;
   style?: StyleProp<ViewStyle>;
+  width?: DimensionValue;
 }
 
 const Button = ({
@@ -21,10 +23,11 @@ const Button = ({
   backgroundColor = "#FFD700",
   color = "#8B4513",
   style,
+  width,
 }: ButtonProps) => {
   return (
     <Pressable
-      style={[styles.button, { backgroundColor }, style]}
+      style={[styles.button, { backgroundColor, width }, style]}
       onPress={onPress}
     >
       <Text style={[styles.buttonText, { color }]}>{text}</Text>
@@ -37,7 +40,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 10,
     borderRadius: 10,
-    width: "100%",
+
     alignItems: "center",
     justifyContent: "center",
     height: 50,

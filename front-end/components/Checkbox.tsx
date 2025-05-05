@@ -13,16 +13,25 @@ interface CheckboxProps {
   setIsChecked: React.Dispatch<React.SetStateAction<boolean>>;
   label?: string;
   style?: StyleProp<ViewStyle>;
+  disabled?: boolean;
 }
 
-const Checkbox = ({ isChecked, setIsChecked, label, style }: CheckboxProps) => {
+const Checkbox = ({
+  isChecked,
+  setIsChecked,
+  label,
+  style,
+  disabled,
+}: CheckboxProps) => {
   const toggleCheckbox = () => {
     setIsChecked(!isChecked);
   };
+
   return (
     <Pressable
       onPress={toggleCheckbox}
       style={[styles.checkboxContainer, style]}
+      disabled={disabled}
     >
       <View style={[styles.checkbox, isChecked && styles.checked]}>
         {isChecked && <Text style={styles.checkmark}>✓</Text>}
