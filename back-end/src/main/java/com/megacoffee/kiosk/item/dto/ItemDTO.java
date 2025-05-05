@@ -12,6 +12,7 @@ public class ItemDTO {
     private String itemName;
     private String itemCategory;
     private String itemSubCategory;
+    private String itemPictureUrl;
     private Integer itemPrice;
     private boolean itemSoldout;
 } 

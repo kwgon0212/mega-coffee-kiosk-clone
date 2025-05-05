@@ -11,6 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ItemDetailDTO {
     private String itemName;
+    private String itemPictureUrl;
     private String itemMenuDetail;
     private Integer itemPrice;
     private Integer itemMakeTime;

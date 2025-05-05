@@ -4,6 +4,8 @@ import com.megacoffee.kiosk.detail.domain.Detail;
 import com.megacoffee.kiosk.detail.application.DetailService;
 import com.megacoffee.kiosk.item.domain.Item;
 import com.megacoffee.kiosk.item.dto.*;
+import com.megacoffee.kiosk.itempicture.domain.ItemPicture;
+import com.megacoffee.kiosk.itempicture.application.ItemPictureRepository;
 import com.megacoffee.kiosk.optioncategories.domain.OptionCategories;
 import com.megacoffee.kiosk.optioncategories.application.OptionCategoriesService;
 import com.megacoffee.kiosk.itemoption.domain.ItemOption;
@@ -11,18 +13,23 @@ import com.megacoffee.kiosk.itemoption.application.ItemOptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.megacoffee.kiosk.global.service.S3Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
 public class ItemService {
     private final ItemRepository itemRepository;
+    private final ItemPictureRepository itemPictureRepository;
     private final DetailService detailService;
     private final OptionCategoriesService optionCategoriesService;
     private final ItemOptionService itemOptionService;
+    private final S3Service s3Service;
 
     @Transactional
     public ItemDetailDTO createMenu(MenuCreateRequest request) {
@@ -48,42 +55,57 @@ public class ItemService {
         item.setItemSoldout(request.isItemSoldout());
         item.setDetailId(detail);
         item.setItemMakeTime(request.getItemMakeTime());
+
+        // Item 저장
         item = itemRepository.save(item);
 
-        // 3. OptionCategories와 ItemOption 생성
-        List<OptionCategories> optionCategories = request.getOptionCategories().stream()
-                .map(categoryRequest -> {
-                    // OptionCategories 생성
-                    OptionCategories optionCategory = new OptionCategories();
-                    optionCategory.setCategoryName(categoryRequest.getCategoryName());
-                    optionCategory.setCategoryDescription(categoryRequest.getCategoryDescription());
-                    optionCategory.setCategoryOrder(categoryRequest.getCategoryOrder());
-                    optionCategory = optionCategoriesService.save(optionCategory);
+        // 3. 이미지가 있는 경우 S3에 업로드하고 ItemPicture 저장
+        if (request.getItemImage() != null && !request.getItemImage().isEmpty()) {
+            try {
+                String imageUrl = s3Service.uploadFile(request.getItemImage());
+                ItemPicture itemPicture = new ItemPicture();
+                itemPicture.setItemPictureUrl(imageUrl);
+                itemPicture.setItem(item);
+                itemPictureRepository.save(itemPicture);
+            } catch (IOException e) {
+                throw new RuntimeException("이미지 업로드 중 오류가 발생했습니다.", e);
+            }
+        }
 
-                    // ItemOption 생성
-                    final OptionCategories finalOptionCategory = optionCategory;
-                    List<ItemOption> options = categoryRequest.getOptions().stream()
-                            .map(optionRequest -> {
-                                ItemOption itemOption = new ItemOption();
-                                itemOption.setOptionName(optionRequest.getOptionName());
-                                itemOption.setOptionPrice(optionRequest.getOptionPrice());
-                                itemOption.setOptionOrder(optionRequest.getOptionOrder());
-                                itemOption.setOptionAvailable(optionRequest.isOptionAvailable());
-                                itemOption.setOptionCategories(finalOptionCategory);
-                                return itemOptionService.save(itemOption);
-                            })
-                            .collect(Collectors.toList());
+        // 4. OptionCategories와 ItemOption 생성
+        List<OptionCategories> optionCategories = new ArrayList<>();
+        for (OptionCategoryRequest categoryRequest : request.getOptionCategories()) {
+            // OptionCategories 생성
+            OptionCategories optionCategory = new OptionCategories();
+            optionCategory.setCategoryName(categoryRequest.getCategoryName());
+            optionCategory.setCategoryDescription(categoryRequest.getCategoryDescription());
+            optionCategory.setCategoryOrder(categoryRequest.getCategoryOrder());
+            optionCategory = optionCategoriesService.save(optionCategory);
 
-                    optionCategory.setOptions(options);
-                    return optionCategory;
-                })
-                .collect(Collectors.toList());
+            // Item과 OptionCategories 연결
+            item.getAvailableOptionCategories().add(optionCategory);
 
-        // 4. Item과 OptionCategories 연결
+            // ItemOptions 처리
+            if (categoryRequest.getOptions() != null) {
+                for (ItemOptionRequest optionRequest : categoryRequest.getOptions()) {
+                    ItemOption itemOption = new ItemOption();
+                    itemOption.setOptionName(optionRequest.getOptionName());
+                    itemOption.setOptionPrice(optionRequest.getOptionPrice());
+                    itemOption.setOptionOrder(optionRequest.getOptionOrder());
+                    itemOption.setOptionAvailable(optionRequest.isOptionAvailable());
+                    itemOption.setOptionCategories(optionCategory);
+                    itemOptionService.save(itemOption);
+                }
+            }
+
+            optionCategories.add(optionCategory);
+        }
+
+        // 5. Item과 OptionCategories 연결
         item.setAvailableOptionCategories(optionCategories);
         item = itemRepository.save(item);
 
-        // 5. 생성된 메뉴의 상세 정보 반환
+        // 6. 생성된 메뉴의 상세 정보 반환
         return getItemDetail(item.getItemId());
     }
 
@@ -178,26 +200,37 @@ public class ItemService {
     public List<ItemDTO> getAllItems() {
         List<Item> items = itemRepository.findAll();
         return items.stream()
-                .map(this::convertToDTO)
+                .map(item -> {
+                    ItemPicture itemPicture = itemPictureRepository.findByItem(item);
+                    return convertToDTO(item, itemPicture);
+                })
                 .collect(Collectors.toList());
     }
 
     public List<ItemDTO> getItemsByCategory(String category) {
         List<Item> items = itemRepository.findByItemCategory(category);
         return items.stream()
-                .map(this::convertToDTO)
+                .map(item -> {
+                    ItemPicture itemPicture = itemPictureRepository.findByItem(item);
+                    return convertToDTO(item, itemPicture);
+                })
                 .collect(Collectors.toList());
     }
 
     public ItemDTO getItemByCategoryAndId(String category, Long itemId) {
         Optional<Item> item = itemRepository.findByItemCategoryAndItemId(category, itemId);
-        return item.map(this::convertToDTO)
-                .orElseThrow(() -> new RuntimeException("Item not found"));
+        return item.map(itemEntity -> {
+            ItemPicture itemPicture = itemPictureRepository.findByItem(itemEntity);
+            return convertToDTO(itemEntity, itemPicture);
+        })
+        .orElseThrow(() -> new RuntimeException("Item not found"));
     }
 
     public ItemDetailDTO getItemDetail(Long itemId) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new RuntimeException("Item not found"));
+
+        ItemPicture itemPicture = itemPictureRepository.findByItem(item);
 
         ItemDetailDTO dto = new ItemDetailDTO();
         dto.setItemName(item.getItemName());
@@ -205,6 +238,7 @@ public class ItemService {
         dto.setItemPrice(item.getItemPrice());
         dto.setItemSoldout(item.isItemSoldout());
         dto.setItemMakeTime(item.getItemMakeTime());
+        dto.setItemPictureUrl(itemPicture != null ? itemPicture.getItemPictureUrl() : null);
 
         // Detail 정보 설정
         Detail detail = item.getDetailId();
@@ -253,12 +287,13 @@ public class ItemService {
         return dto;
     }
 
-    private ItemDTO convertToDTO(Item item) {
+    private ItemDTO convertToDTO(Item item, ItemPicture itemPicture) {
         ItemDTO dto = new ItemDTO();
         dto.setItemId(item.getItemId());
         dto.setItemCategory(item.getItemCategory());
         dto.setItemName(item.getItemName());
         dto.setItemSubCategory(item.getItemSubCategory());
+        dto.setItemPictureUrl(itemPicture != null ? itemPicture.getItemPictureUrl() : null);
         dto.setItemPrice(item.getItemPrice());
         dto.setItemSoldout(item.isItemSoldout());
         return dto;
@@ -294,7 +329,10 @@ public class ItemService {
     public List<ItemDTO> getItemsBySubcategory(String category, String subCategory) {
         List<Item> items = itemRepository.findByItemCategoryAndItemSubCategory(category, subCategory);
         return items.stream()
-                .map(this::convertToDTO)
+                .map(item -> {
+                    ItemPicture itemPicture = itemPictureRepository.findByItem(item);
+                    return convertToDTO(item, itemPicture);
+                })
                 .collect(Collectors.toList());
     }
 }
