@@ -16,6 +16,7 @@ interface ButtonProps {
   color?: string;
   style?: StyleProp<ViewStyle>;
   width?: DimensionValue;
+  disabled?: boolean;
 }
 
 const Button = ({
@@ -26,13 +27,25 @@ const Button = ({
   color = "#8B4513",
   style,
   width,
+  disabled = false,
 }: ButtonProps) => {
   return (
     <Pressable
-      style={[styles.button, { backgroundColor, width }, style]}
+      style={[
+        {
+          backgroundColor: disabled ? "#ccc" : backgroundColor,
+          padding: 15,
+          borderRadius: 8,
+          alignItems: "center",
+        },
+        style,
+      ]}
       onPress={onPress}
+      disabled={disabled}
     >
-      <Text style={[styles.buttonText, { color }]}>{title || text}</Text>
+      <Text style={{ color: disabled ? "#666" : color, fontSize: 16 }}>
+        {title || text}
+      </Text>
     </Pressable>
   );
 };

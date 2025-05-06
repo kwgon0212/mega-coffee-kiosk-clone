@@ -8,21 +8,16 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { Order } from "@/type";
-
-interface OrderResponse {
-  success: boolean;
-  status: number;
-  message: string;
-  data: Order[];
-}
 
 const AdminOrderPage = () => {
   const [activeAccordionId, setActiveAccordionId] = useState<string | null>(
     null
   );
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const fetchOrders = async () => {
     const response = await fetch(
@@ -44,13 +39,34 @@ const AdminOrderPage = () => {
   });
 
   const handleOrderStatusChange = async (orderId: string, status: string) => {
-    const response = await fetch(
-      `${process.env.EXPO_PUBLIC_BASE_URL}/api/orders/admin/${orderId}?status=${status}`
-    );
-    const data = await response.json();
-    console.log("data", data);
-    if (data.success) {
-      refetch();
+    console.log("orderId", orderId);
+    console.log("status", status);
+    try {
+      setIsUpdating(true);
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_BASE_URL}/api/orders/admin/${orderId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            orderStatus: status,
+          }),
+        }
+      );
+      const data = await response.json();
+
+      if (data.success) {
+        await refetch();
+        Alert.alert("성공", "주문 상태가 변경되었습니다.");
+      } else {
+        Alert.alert("실패", "주문 상태 변경에 실패했습니다.");
+      }
+    } catch (error) {
+      Alert.alert("오류", "주문 상태 변경 중 오류가 발생했습니다.");
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -92,6 +108,11 @@ const AdminOrderPage = () => {
 
   return (
     <Layout>
+      {isUpdating && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color="#452613" />
+        </View>
+      )}
       <ScrollView>
         <View style={styles.container}>
           <Text style={styles.title}>주문승인 대기</Text>
@@ -126,7 +147,10 @@ const AdminOrderPage = () => {
                           </Text>
                         </View>
                         {menu.options.map((option) => (
-                          <Text style={styles.orderMenuOption}>
+                          <Text
+                            key={option.optionName}
+                            style={styles.orderMenuOption}
+                          >
                             +{option.optionName}
                           </Text>
                         ))}
@@ -151,8 +175,9 @@ const AdminOrderPage = () => {
                   <Button
                     text="주문확인"
                     onPress={() => {
-                      handleOrderStatusChange(order.orderId, "PREPARING");
+                      handleOrderStatusChange(order.orderId, "COMPLETED");
                     }}
+                    disabled={isUpdating}
                   />
                 </View>
               </Accordion>
@@ -160,9 +185,9 @@ const AdminOrderPage = () => {
         </View>
 
         <View style={styles.container}>
-          <Text style={styles.title}>제조완료 대기</Text>
+          <Text style={styles.title}>제조완료</Text>
           {orders
-            .filter((order) => order.orderStatus === "PREPARING")
+            .filter((order) => order.orderStatus === "COMPLETED")
             .map((order) => (
               <Accordion
                 key={order.orderId}
@@ -178,7 +203,7 @@ const AdminOrderPage = () => {
                   <Text style={styles.orderCustomer}>주문자: {"test123"}</Text>
                   <View style={styles.orderMenuContainer}>
                     {order.orderMenus.map((menu) => (
-                      <Text style={styles.orderMenuOption}>
+                      <Text key={menu.itemName} style={styles.orderMenuOption}>
                         {menu.itemName} x{menu.itemCount}
                       </Text>
                     ))}
@@ -203,8 +228,9 @@ const AdminOrderPage = () => {
                     backgroundColor="#452613"
                     color="white"
                     onPress={() => {
-                      handleOrderStatusChange(order.orderId, "COMPLETED");
+                      // handleOrderStatusChange(order.orderId, "COMPLETED");
                     }}
+                    disabled={isUpdating}
                   />
                 </View>
               </Accordion>
@@ -258,6 +284,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(255, 255, 255, 0.7)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000,
   },
 });
 
