@@ -7,10 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -32,5 +29,13 @@ public class StoreController {
     public ResponseEntity<?> createStore(@RequestBody Store store) {
         Store savedStore = storeRepository.save(store);
         return ResponseEntity.ok(SuccessResponse.success("success", savedStore));
+    }
+
+    @DeleteMapping("/api/store/{id}")
+    public void deleteStore(@PathVariable Long id) {
+        Store store = storeRepository.findById(id);
+        if (store != null) {
+            storeRepository.delete(store);
+        }
     }
 }

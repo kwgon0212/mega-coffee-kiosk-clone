@@ -9,4 +9,6 @@ public interface StoreRepository {
     public Store findByName(String name);
     public Store save(Store store);
     public List<Store> findAll();
+
+    public void delete(Store store);
 }

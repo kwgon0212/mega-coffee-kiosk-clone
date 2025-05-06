@@ -40,4 +40,10 @@ public class StoreRepositoryImpl implements StoreRepository {
         return em.createQuery("SELECT s FROM Store s", Store.class)
                 .getResultList();
     }
+
+    @Override
+    @Transactional
+    public void delete(Store store) {
+        em.remove(store);
+    }
 }
