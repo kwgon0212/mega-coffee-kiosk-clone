@@ -5,7 +5,7 @@ import { router } from "expo-router";
 import HeaderOptions from "@/components/HeaderOptions";
 import StoreModal from "./StoreModal";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-
+import * as SecureStore from "expo-secure-store";
 interface Store {
   name: string;
   address: {
@@ -22,8 +22,28 @@ const StorePage = () => {
   const [selectedOption, setSelectedOption] = useState("list");
   const [isOpenStoreModal, setIsOpenStoreModal] = useState(false);
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
-
+  const [isAdmin, setIsAdmin] = useState(true);
   const [storeList, setStoreList] = useState<Store[]>([]);
+
+  useEffect(() => {
+    const fetchIsAdmin = async () => {
+      const accessToken = await SecureStore.getItemAsync("accessToken");
+
+      const res = await fetch(
+        `${process.env.EXPO_PUBLIC_BASE_URL}/auth/check/admin`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await res.json();
+      // setIsAdmin(data.isAdmin);
+    };
+    fetchIsAdmin();
+  }, []);
 
   useEffect(() => {
     const fetchStoreList = async () => {
@@ -52,7 +72,7 @@ const StorePage = () => {
         <View style={{ flexDirection: "row" }}>
           <Text style={styles.storeCount}>내 주변에 </Text>
           <View style={{ position: "relative" }}>
-            <Text style={styles.storeCount}>{10}개의 매장</Text>
+            <Text style={styles.storeCount}>{storeList.length}개의 매장</Text>
             <View style={styles.highlight} />
           </View>
           <Text style={styles.storeCount}>이 있습니다.</Text>
@@ -83,12 +103,14 @@ const StorePage = () => {
         />
       )}
 
-      <TouchableOpacity
-        style={styles.adminButton}
-        onPress={() => router.push("/(admin)")}
-      >
-        <MaterialIcons name="admin-panel-settings" size={24} color="black" />
-      </TouchableOpacity>
+      {isAdmin && (
+        <TouchableOpacity
+          style={styles.adminButton}
+          onPress={() => router.push("/(admin)")}
+        >
+          <MaterialIcons name="admin-panel-settings" size={24} color="black" />
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
