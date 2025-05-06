@@ -87,36 +87,20 @@ export interface PersonalOption {
   topping?: Record<string, number>;
 }
 
-const americanoOptions: PersonalOption = {
-  샷: {
-    연하게: 0,
-    "샷 추가": 600,
-    "2샷 추가": 1200,
-  },
-  당도: {
-    연유추가: 700,
-    "저당 스테비아 추가": 700,
-  },
-  토핑: {
-    "초코젤라또 추가": 700,
-    휘핑추가: 500,
-    "타피오카펄 추가": 700,
-  },
-};
-
-const bigAmericanoOptions: PersonalOption = {
-  샷: {
-    연하게: 0,
-    "샷 추가": 600,
-    "2샷 추가": 1200,
-  },
-  당도: {
-    연유추가: 700,
-    "저당 스테비아 추가": 700,
-  },
-  토핑: {
-    "초코젤라또 추가": 700,
-    휘핑추가: 500,
-    "타피오카펄 추가": 700,
-  },
-};
+export interface Order {
+  orderId: string;
+  storeName: string;
+  orderNumber: number;
+  orderTime: string;
+  orderStatus: string;
+  orderCount: number;
+  orderMenus: {
+    itemName: string;
+    itemPrice: number;
+    itemCount: number;
+    options: {
+      optionName: string;
+      optionPrice: number;
+    }[];
+  }[];
+}

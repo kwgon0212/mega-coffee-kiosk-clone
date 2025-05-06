@@ -2,53 +2,143 @@ import Accordion from "@/components/Accordion";
 import Button from "@/components/Button";
 import Layout from "@/components/ui/Layout";
 import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
+import { useQuery } from "@tanstack/react-query";
+import { Order } from "@/type";
+
+interface OrderResponse {
+  success: boolean;
+  status: number;
+  message: string;
+  data: Order[];
+}
 
 const AdminOrderPage = () => {
   const [activeAccordionId, setActiveAccordionId] = useState<string | null>(
     null
   );
 
-  const orders = [
-    { id: "1", title: "주문번호1", status: "결제완료" },
-    { id: "2", title: "주문번호2", status: "결제완료" },
-    { id: "3", title: "주문번호3", status: "결제완료" },
-    { id: "4", title: "주문번호4", status: "승인대기" },
-    { id: "5", title: "주문번호5", status: "승인대기" },
-  ];
+  const fetchOrders = async () => {
+    const response = await fetch(
+      `${process.env.EXPO_PUBLIC_BASE_URL}/api/orders/admin`
+    );
+    const data = await response.json();
+    return data;
+  };
+
+  const {
+    data: orders,
+    isLoading,
+    isError,
+  } = useQuery<Order[]>({
+    queryKey: ["orders"],
+    queryFn: fetchOrders,
+    select: (res: any) => res.data,
+  });
+
+  const handleOrderStatusChange = async (orderId: string, status: string) => {
+    const response = await fetch(
+      `${process.env.EXPO_PUBLIC_BASE_URL}/api/orders/admin/${orderId}?status=${status}`
+    );
+    const data = await response.json();
+    console.log(data);
+  };
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <ActivityIndicator size="large" color="black" />
+        </View>
+      </Layout>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Layout>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <Text>주문 데이터를 불러오는데 실패했습니다.</Text>
+        </View>
+      </Layout>
+    );
+  }
+
+  if (!orders) {
+    return (
+      <Layout>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <Text>주문 데이터가 없습니다.</Text>
+        </View>
+      </Layout>
+    );
+  }
 
   return (
-    <Layout style={{}}>
+    <Layout>
       <ScrollView>
         <View style={styles.container}>
           <Text style={styles.title}>주문승인 대기</Text>
           {orders
-            .filter((order) => order.status === "결제완료")
+            .filter((order) => order.orderStatus === "CONFIRMED")
             .map((order) => (
               <Accordion
-                key={order.id}
-                title={order.title}
-                subtitle="아이스 아메리카노 및 3개"
-                isOpen={activeAccordionId === order.id}
+                key={order.orderId}
+                title={`${order.storeName} 주문번호 ${order.orderNumber}`}
+                subtitle={`${order.orderCount}개의 상품`}
+                isOpen={activeAccordionId === order.orderId}
                 setIsOpen={(open) =>
-                  setActiveAccordionId(open ? order.id : null)
+                  setActiveAccordionId(open ? order.orderId : null)
                 }
+                isStyled
               >
                 <View style={styles.orderCard}>
                   <Text style={styles.orderCustomer}>주문자: {"test123"}</Text>
                   <View style={styles.orderMenuContainer}>
-                    <Text style={styles.orderMenu}>
-                      아이스 아메리카노 x {1}
-                    </Text>
-                    <Text style={styles.orderMenuOption}>바닐라시럽추가</Text>
-                    <Text style={styles.orderMenuOption}>휘핑크림추가</Text>
-                    <Text style={styles.orderMenuOption}>연하게</Text>
-                    <Text style={styles.orderMenuOption}>타피오카 펄추가</Text>
+                    {order.orderMenus.map((menu) => (
+                      <View style={{ gap: 10 }}>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            alignItems: "flex-end",
+                            gap: 5,
+                          }}
+                        >
+                          <Text style={styles.orderMenu}>{menu.itemName}</Text>
+                          <Text style={{ fontSize: 16, fontWeight: "600" }}>
+                            x{menu.itemCount}
+                          </Text>
+                        </View>
+                        {menu.options.map((option) => (
+                          <Text style={styles.orderMenuOption}>
+                            +{option.optionName}
+                          </Text>
+                        ))}
+                      </View>
+                    ))}
                   </View>
 
                   <View style={styles.orderInfoContainer}>
                     <Text>주문일시</Text>
-                    <Text>2025-01-01 12:00:00</Text>
+                    <Text>
+                      {new Date(order.orderTime).toLocaleString("ko-KR", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                      })}
+                    </Text>
                   </View>
                   <View style={styles.orderInfoContainer}>
                     <Text>주문금액</Text>
@@ -57,7 +147,7 @@ const AdminOrderPage = () => {
                   <Button
                     text="주문확인"
                     onPress={() => {
-                      order.status = "승인대기";
+                      handleOrderStatusChange(order.orderId, "PREPARING");
                     }}
                   />
                 </View>
@@ -68,32 +158,37 @@ const AdminOrderPage = () => {
         <View style={styles.container}>
           <Text style={styles.title}>제조완료 대기</Text>
           {orders
-            .filter((order) => order.status === "승인대기")
+            .filter((order) => order.orderStatus === "PREPARING")
             .map((order) => (
               <Accordion
-                key={order.id}
-                title={order.title}
-                subtitle="아이스 아메리카노 및 3개"
-                isOpen={activeAccordionId === order.id}
+                key={order.orderId}
+                title={order.storeName}
+                subtitle={`${order.orderCount}개의 상품`}
+                isOpen={activeAccordionId === order.orderId}
                 setIsOpen={(open) =>
-                  setActiveAccordionId(open ? order.id : null)
+                  setActiveAccordionId(open ? order.orderId : null)
                 }
+                isStyled
               >
                 <View style={styles.orderCard}>
                   <Text style={styles.orderCustomer}>주문자: {"test123"}</Text>
                   <View style={styles.orderMenuContainer}>
-                    <Text style={styles.orderMenu}>
-                      아이스 아메리카노 x {1}
-                    </Text>
-                    <Text style={styles.orderMenuOption}>바닐라시럽추가</Text>
-                    <Text style={styles.orderMenuOption}>휘핑크림추가</Text>
-                    <Text style={styles.orderMenuOption}>연하게</Text>
-                    <Text style={styles.orderMenuOption}>타피오카 펄추가</Text>
+                    {order.orderMenus.map((menu) => (
+                      <Text style={styles.orderMenuOption}>
+                        {menu.itemName} x{menu.itemCount}
+                      </Text>
+                    ))}
                   </View>
 
                   <View style={styles.orderInfoContainer}>
                     <Text>주문일시</Text>
-                    <Text>2025-01-01 12:00:00</Text>
+                    <Text>
+                      {new Date(order.orderTime).toLocaleString("ko-KR", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                      })}
+                    </Text>
                   </View>
                   <View style={styles.orderInfoContainer}>
                     <Text>주문금액</Text>
@@ -103,6 +198,9 @@ const AdminOrderPage = () => {
                     text="제조완료"
                     backgroundColor="#452613"
                     color="white"
+                    onPress={() => {
+                      handleOrderStatusChange(order.orderId, "COMPLETED");
+                    }}
                   />
                 </View>
               </Accordion>
@@ -146,6 +244,10 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
   orderMenuContainer: {
+    backgroundColor: "#eee",
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderRadius: 10,
     gap: 5,
   },
   orderInfoContainer: {
