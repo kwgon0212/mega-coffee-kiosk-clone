@@ -14,6 +14,14 @@ export default function MenuLayout() {
         }}
       />
       <Stack.Screen
+        name="list/index"
+        options={{
+          header: () => (
+            <Header title="주문 내역" showBackButton borderBottomWidth={0} />
+          ),
+        }}
+      />
+      <Stack.Screen
         name="list/[orderId]/index"
         options={{
           header: () => (

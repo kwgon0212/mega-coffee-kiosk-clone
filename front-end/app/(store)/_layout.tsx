@@ -23,7 +23,7 @@ export default function StoreLayout() {
                   />
                   <OrderListButton
                     onPress={() => {
-                      router.push("/(order)/list/7");
+                      router.push("/(order)/list");
                     }}
                   />
                 </View>

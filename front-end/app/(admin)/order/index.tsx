@@ -132,8 +132,11 @@ const AdminOrderPage = () => {
                 <View style={styles.orderCard}>
                   <Text style={styles.orderCustomer}>주문자: {"test123"}</Text>
                   <View style={styles.orderMenuContainer}>
-                    {order.orderMenus.map((menu) => (
-                      <View style={{ gap: 10 }} key={menu.itemName}>
+                    {order.orderMenus.map((menu, menuIndex) => (
+                      <View
+                        style={{ gap: 10 }}
+                        key={`${menu.itemName}-${menu.itemCount}-${menuIndex}`}
+                      >
                         <View
                           style={{
                             flexDirection: "row",
@@ -146,9 +149,9 @@ const AdminOrderPage = () => {
                             x{menu.itemCount}
                           </Text>
                         </View>
-                        {menu.options.map((option) => (
+                        {menu.options.map((option, optIndex) => (
                           <Text
-                            key={option.optionName}
+                            key={`${option.optionName}-${option.optionPrice}-${optIndex}`}
                             style={styles.orderMenuOption}
                           >
                             +{option.optionName}
@@ -202,8 +205,11 @@ const AdminOrderPage = () => {
                 <View style={styles.orderCard}>
                   <Text style={styles.orderCustomer}>주문자: {"test123"}</Text>
                   <View style={styles.orderMenuContainer}>
-                    {order.orderMenus.map((menu) => (
-                      <Text key={menu.itemName} style={styles.orderMenuOption}>
+                    {order.orderMenus.map((menu, menuIndex) => (
+                      <Text
+                        key={`${menu.itemName}-${menu.itemCount}-${menuIndex}`}
+                        style={styles.orderMenuOption}
+                      >
                         {menu.itemName} x{menu.itemCount}
                       </Text>
                     ))}

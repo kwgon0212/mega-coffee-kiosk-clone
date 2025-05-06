@@ -73,6 +73,7 @@ export interface CartItem {
   options: { optionName: string; optionPrice: number }[];
   perTotalPrice: number;
   createdCartItemAt: Date;
+  itemMakeTime: number;
 }
 
 export interface PersonalOption {

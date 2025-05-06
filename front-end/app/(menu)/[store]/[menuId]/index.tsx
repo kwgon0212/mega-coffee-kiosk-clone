@@ -190,6 +190,7 @@ const MenuDetailPage = () => {
       price: menu.itemPrice,
       perTotalPrice: totalPrice,
       createdCartItemAt: new Date(),
+      itemMakeTime: menu.itemMakeTime,
     };
     addToCart(cartItem);
     resetState();
@@ -226,6 +227,7 @@ const MenuDetailPage = () => {
       price: menu.itemPrice,
       perTotalPrice: totalPrice,
       createdCartItemAt: new Date(),
+      itemMakeTime: menu.itemMakeTime,
     };
     addToCart(cartItem);
     resetState();

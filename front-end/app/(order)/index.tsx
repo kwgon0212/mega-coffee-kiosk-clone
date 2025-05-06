@@ -41,6 +41,7 @@ const OrderPage = () => {
     const userInfo = JSON.parse(userInfoItem || "{}");
 
     if (Object.keys(userInfo).length === 0) return;
+    console.log("nickname", userInfo.nickname);
 
     const response = await fetch(
       `${process.env.EXPO_PUBLIC_BASE_URL}/api/orders/${userInfo.userId}`,
@@ -65,7 +66,7 @@ const OrderPage = () => {
           discountPrice: 0,
           paymentMethod,
           nickname: userInfo.nickname,
-          itemMakeTime: 5, // (menu)/[store]/[menuId]에서 카트에 저장할때 makeTime도 같이 저장해야함
+          itemMakeTime: cart.reduce((acc, item) => acc + item.itemMakeTime, 0), // (menu)/[store]/[menuId]에서 카트에 저장할때 makeTime도 같이 저장해야함
         }),
       }
     );
