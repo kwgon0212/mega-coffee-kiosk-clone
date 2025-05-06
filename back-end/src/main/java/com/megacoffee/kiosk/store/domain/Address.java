@@ -1,14 +1,16 @@
 package com.megacoffee.kiosk.store.domain;
 
-import lombok.RequiredArgsConstructor;
+import jakarta.persistence.Embeddable;
+import lombok.*;
 
-@RequiredArgsConstructor
+@Embeddable
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Address {
-    private final String street;
-    private final String city;
-    private final String state;
+    private String street;
+    private String city;
+    private String zipCode;
 
-    public String getAddress() {
-        return street + ", " + city + ", " + state;
-    }
+    private Coord coord;
 }
