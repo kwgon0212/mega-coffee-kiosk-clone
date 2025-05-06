@@ -22,8 +22,12 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./back-end/gradlew
 
+      # - name: Build backend JAR (skip tests)
+      #   run: ./gradlew clean build --refresh-dependencies -x test
+      #   working-directory: back-end
+
       - name: Build backend JAR (skip tests)
-        run: ./gradlew clean build --refresh-dependencies -x test
+        run: ./gradlew clean build --no-daemon --refresh-dependencies -x test
         working-directory: back-end
 
       - name: Configure AWS credentials
