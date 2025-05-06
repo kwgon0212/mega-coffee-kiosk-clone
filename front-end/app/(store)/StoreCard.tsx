@@ -9,12 +9,19 @@ interface StoreCardProps {
 }
 
 const StoreCard = ({ name, address, distance, onPress }: StoreCardProps) => {
+  const formatDistance = (meters: number) => {
+    if (meters < 1000) {
+      return `${Math.round(meters)}m`;
+    }
+    return `${(meters / 1000).toFixed(1)}km`;
+  };
+
   return (
     <Pressable style={styles.container} onPress={onPress}>
       <View style={styles.infoContainer}>
         <Text style={styles.name}>{name}</Text>
         <Text style={styles.address}>{address}</Text>
-        <Text style={styles.distance}>{distance}m</Text>
+        <Text style={styles.distance}>{formatDistance(distance)}</Text>
       </View>
       <View>
         <Image
@@ -48,13 +55,14 @@ const styles = StyleSheet.create({
     color: "gray",
   },
   distance: {
-    color: "red",
+    color: "#452613",
     fontSize: 16,
+    fontWeight: "500",
   },
   storeImage: {
     width: 70,
     height: 70,
-    borderRadius: "100%",
+    borderRadius: 100,
   },
 });
 

@@ -1,42 +1,16 @@
 {
-  "member": [
-    {
-      "id": 1,
-      "account": "test@test.com",
-      "pw": "test1234",
-      "name": "홍길동",
-      "nickname": "홍길동 닉네임",
-      "gender": "male",
-      "phoneNumber": "01012345678",
-      "birth": "1990-01-01T00:00:00.000Z",
-      "role": "normal"
-    },
-    {
-      "id": 2,
-      "account": "test2@test.com",
-      "pw": "test1234",
-      "name": "이순신",
-      "nickname": "이순신 닉네임",
-      "gender": "male",
-      "phoneNumber": "01012345678",
-      "birth": "1990-01-01T00:00:00.000Z",
-      "role": "normal"
-    }
-  ],
-
   "store": [
     {
       "id": 10,
-      "name": "중구 중림점",
+      "name": "중구중림점",
       "address": {
         "zipCode": "12345",
         "city": "서울특별시",
-        "street": "강남구 강남대로 123-45",
+        "street": "중구 청파로 457-1",
         "detail": "1층"
       },
-      "distance": 47,
-      "lat": 37.5665,
-      "lng": 126.9783
+      "lat": 37.562241,
+      "lng": 126.968495
     },
     {
       "id": 11,
@@ -44,156 +18,11 @@
       "address": {
         "zipCode": "12345",
         "city": "서울특별시",
-        "street": "중구 충정로 123-45",
-        "detail": "1층"
+        "street": "중구 중림로 10",
+        "detail": "상가1동 1층 104-2호"
       },
-      "distance": 325,
-      "lat": 37.5665,
-      "lng": 126.9783
-    }
-  ],
-
-  "orders": [
-    {
-      "id": 100,
-      "memberId": 1,
-      "orderCount": 2,
-      "ordermenus": [
-        {
-          "ordermenuId": 9999,
-          "item_quantity": 1,
-          "item_name": "아메리카노",
-          "item_price": 5000
-        }
-      ],
-      "orderoption": {
-        "option_name": "샷 추가",
-        "option_price": 1000
-      }
-    }
-  ],
-
-  "menus": [
-    {
-      "id": 1,
-      "name": "(ICE)헛개리카노",
-      "category": "coffee",
-      "price": 5000,
-      "image": "https://img.79plus.co.kr/megahp/manager/upload/menu/20250320000925_1742396965069_ekSqAIVc1L.jpg",
-      "description": "라떼는 커피와 우유를 섞은 음료입니다.",
-      "info": {
-        "kcal": 16.7,
-        "natrium": 0.7,
-        "carbohydrate": 2.1,
-        "sugar": 0,
-        "fat": 0.7,
-        "transFat": 0,
-        "protein": 0.7,
-        "caffeine": 290.766,
-        "allergy": ["라떼", "커피", "우유"]
-      },
-      "options": {
-        "연하게": 0,
-        "샷 추가": 600,
-        "2샷 추가": 1200,
-        "디카페인 샷 추가": 1000,
-        "디카페인 2샷 추가": 2000
-      }
-    },
-    {
-      "id": 2,
-      "name": "(ICE)왕메가헛개리카노",
-      "category": "coffee",
-      "price": 5000,
-      "image": "https://img.79plus.co.kr/megahp/manager/upload/menu/20250320001838_1742397518902_MCGDHqjxXi.jpg",
-      "description": "라떼는 커피와 우유를 섞은 음료입니다.",
-      "info": {
-        "kcal": 16.7,
-        "natrium": 0.7,
-        "carbohydrate": 2.1,
-        "sugar": 0,
-        "fat": 0.7,
-        "transFat": 0,
-        "protein": 0.7,
-        "caffeine": 290.766,
-        "allergy": ["라떼", "커피", "우유"]
-      }
-    },
-    {
-      "id": 3,
-      "name": "연유라떼",
-      "category": "coffee",
-      "price": 5000,
-      "image": "https://img.79plus.co.kr/megahp/manager/upload/menu/20240610132459_1717993499610_KiXcTR2q5P.jpg",
-      "description": "라떼는 커피와 우유를 섞은 음료입니다.",
-      "info": {
-        "kcal": 16.7,
-        "natrium": 0.7,
-        "carbohydrate": 2.1,
-        "sugar": 0,
-        "fat": 0.7,
-        "transFat": 0,
-        "protein": 0.7,
-        "caffeine": 290.766,
-        "allergy": ["라떼", "커피", "우유"]
-      }
-    },
-    {
-      "id": 4,
-      "name": "디카페인 헤이즐넛 아메리카노",
-      "category": "coffee",
-      "price": 5000,
-      "image": "https://img.79plus.co.kr/megahp/manager/upload/menu/20240610105046_1717984246492_KeavFH2VTO.jpg",
-      "description": "라떼는 커피와 우유를 섞은 음료입니다.",
-      "info": {
-        "kcal": 16.7,
-        "natrium": 0.7,
-        "carbohydrate": 2.1,
-        "sugar": 0,
-        "fat": 0.7,
-        "transFat": 0,
-        "protein": 0.7,
-        "caffeine": 290.766,
-        "allergy": ["라떼", "커피", "우유"]
-      }
-    },
-    {
-      "id": 5,
-      "name": "메가리카노",
-      "category": "coffee",
-      "price": 5000,
-      "image": "https://img.79plus.co.kr/megahp/manager/upload/menu/20240610132223_1717993343456_4KESgpG57t.jpg",
-      "description": "라떼는 커피와 우유를 섞은 음료입니다.",
-      "info": {
-        "kcal": 16.7,
-        "natrium": 0.7,
-        "carbohydrate": 2.1,
-        "sugar": 0,
-        "fat": 0.7,
-        "transFat": 0,
-        "protein": 0.7,
-        "caffeine": 290.766,
-        "allergy": ["라떼", "커피", "우유"]
-      }
-    },
-    {
-      "id": 6,
-      "name": "에스프레소 도피오",
-      "category": "coffee",
-      "price": 5000,
-      "image": "https://img.79plus.co.kr/megahp/manager/upload/menu/20240610105413_1717984453131_1es5v0RxH2.jpg",
-      "description": "라떼는 커피와 우유를 섞은 음료입니다.",
-      "info": {
-        "kcal": 16.7,
-        "natrium": 0.7,
-        "carbohydrate": 2.1,
-        "sugar": 0,
-        "fat": 0.7,
-        "transFat": 0,
-        "protein": 0.7,
-        "caffeine": 290.766,
-        "allergy": ["라떼", "커피", "우유"]
-      }
+      "lat": 37.55847,
+      "lng": 126.965304
     }
   ]
 }

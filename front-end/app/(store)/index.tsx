@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import StoreCard from "./StoreCard";
 import { router } from "expo-router";
 import HeaderOptions from "@/components/HeaderOptions";
 import StoreModal from "./StoreModal";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import * as SecureStore from "expo-secure-store";
+import * as Location from "expo-location";
+
 interface Store {
   name: string;
   address: {
@@ -14,16 +16,61 @@ interface Store {
     street: string;
     detail: string;
   };
-  distance: number;
   lat: number;
   lng: number;
 }
+
 const StorePage = () => {
   const [selectedOption, setSelectedOption] = useState("list");
   const [isOpenStoreModal, setIsOpenStoreModal] = useState(false);
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
   const [isAdmin, setIsAdmin] = useState(true);
   const [storeList, setStoreList] = useState<Store[]>([]);
+  const [currentLocation, setCurrentLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+
+  // 현재 위치 가져오기
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "위치 권한이 필요합니다",
+          "매장과의 거리를 계산하기 위해 위치 권한이 필요합니다."
+        );
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setCurrentLocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+    })();
+  }, []);
+
+  // 두 지점 간의 거리 계산 (Haversine 공식)
+  const calculateDistance = (
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number
+  ) => {
+    const R = 6371e3; // 지구의 반경 (미터)
+    const φ1 = (lat1 * Math.PI) / 180;
+    const φ2 = (lat2 * Math.PI) / 180;
+    const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+    const Δλ = ((lon2 - lon1) * Math.PI) / 180;
+
+    const a =
+      Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+      Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c; // 미터 단위로 반환
+  };
 
   useEffect(() => {
     const fetchIsAdmin = async () => {
@@ -50,7 +97,6 @@ const StorePage = () => {
       const response = await fetch(
         `${process.env.EXPO_PUBLIC_TEST_SERVER}/store`
       );
-      // const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/api/store`);
       const data = await response.json();
       setStoreList(data);
     };
@@ -84,7 +130,16 @@ const StorePage = () => {
                 key={index}
                 name={store.name}
                 address={`${store.address.city} ${store.address.street} ${store.address.detail}`}
-                distance={store.distance}
+                distance={
+                  currentLocation
+                    ? calculateDistance(
+                        currentLocation.latitude,
+                        currentLocation.longitude,
+                        store.lat,
+                        store.lng
+                      )
+                    : 0
+                }
                 onPress={() => {
                   setIsOpenStoreModal(true);
                   setSelectedStore(store);
@@ -97,9 +152,9 @@ const StorePage = () => {
 
       {selectedStore && (
         <StoreModal
-          isOpen={isOpenStoreModal}
-          setIsOpen={setIsOpenStoreModal}
-          info={selectedStore}
+          isVisible={isOpenStoreModal}
+          onClose={() => setIsOpenStoreModal(false)}
+          store={selectedStore}
         />
       )}
 
