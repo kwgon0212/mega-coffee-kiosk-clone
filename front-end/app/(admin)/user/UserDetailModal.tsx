@@ -12,91 +12,70 @@ import Button from "@/components/Button";
 interface User {
   id: string;
   name: string;
-  email: string;
-  phoneNumber: string;
-  joinDate: string;
-  lastOrder: string;
-  orderCount: number;
-  status: "활성" | "휴면" | "정지";
+  nickName: string;
+  gender: "MALE" | "FEMALE" | null;
+  phoneNumber: string | null;
+  dateOfBirth: string;
+  role: "ADMIN" | "USER";
 }
 
 interface UserDetailModalProps {
   user: User | null;
   onClose: () => void;
-  onStatusChange?: (userId: string, newStatus: "활성" | "정지") => void;
 }
 
-const UserDetailModal = ({
-  user,
-  onClose,
-  onStatusChange,
-}: UserDetailModalProps) => {
+const UserDetailModal = ({ user, onClose }: UserDetailModalProps) => {
   if (!user) return null;
 
   return (
-    <Modal
-      visible={!!user}
-      animationType="fade"
-      transparent={true}
-      onRequestClose={onClose}
-    >
+    <Modal visible={!!user} animationType="slide" transparent>
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-          <ScrollView showsVerticalScrollIndicator={false}>
-            <Text style={styles.modalTitle}>회원 상세 정보</Text>
+          <ScrollView>
+            <Text style={styles.title}>회원 상세 정보</Text>
 
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>이름</Text>
-              <Text style={styles.detailValue}>{user.name}</Text>
-            </View>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>이메일</Text>
-              <Text style={styles.detailValue}>{user.email}</Text>
-            </View>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>전화번호</Text>
-              <Text style={styles.detailValue}>{user.phoneNumber}</Text>
-            </View>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>가입일</Text>
-              <Text style={styles.detailValue}>{user.joinDate}</Text>
-            </View>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>최근 주문</Text>
-              <Text style={styles.detailValue}>{user.lastOrder}</Text>
-            </View>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>총 주문수</Text>
-              <Text style={styles.detailValue}>{user.orderCount}회</Text>
-            </View>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>계정 상태</Text>
-              <Text style={styles.detailValue}>{user.status}</Text>
+            <View style={styles.infoContainer}>
+              <Text style={styles.label}>이름</Text>
+              <Text style={styles.value}>{user.name}</Text>
             </View>
 
-            <View style={styles.modalActions}>
+            <View style={styles.infoContainer}>
+              <Text style={styles.label}>닉네임</Text>
+              <Text style={styles.value}>{user.nickName}</Text>
+            </View>
+
+            <View style={styles.infoContainer}>
+              <Text style={styles.label}>전화번호</Text>
+              <Text style={styles.value}>{user.phoneNumber}</Text>
+            </View>
+
+            <View style={styles.infoContainer}>
+              <Text style={styles.label}>성별</Text>
+              <Text style={styles.value}>
+                {user.gender === "MALE"
+                  ? "남성"
+                  : user.gender === "FEMALE"
+                  ? "여성"
+                  : "선택 안함"}
+              </Text>
+            </View>
+
+            <View style={styles.infoContainer}>
+              <Text style={styles.label}>생년월일</Text>
+              <Text style={styles.value}>{user.dateOfBirth}</Text>
+            </View>
+
+            <View style={styles.buttonContainer}>
               <Button
                 text="닫기"
                 onPress={onClose}
-                style={styles.modalButton}
-                backgroundColor="#888"
-              />
-              <Button
-                text={user.status === "정지" ? "계정 활성화" : "계정 정지"}
-                style={styles.modalButton}
-                backgroundColor={user.status === "정지" ? "#452613" : "#FF4444"}
-                color="white"
-                onPress={() =>
-                  onStatusChange?.(
-                    user.id,
-                    user.status === "정지" ? "활성" : "정지"
-                  )
-                }
+                style={styles.button}
+                backgroundColor="#e8e4e0"
+                color="#452613"
               />
             </View>
           </ScrollView>
         </View>
-        <Pressable style={styles.modalOverlay} onPress={onClose} />
       </View>
     </Modal>
   );
@@ -107,13 +86,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-  },
-  modalOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
@@ -121,36 +93,34 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 20,
     width: "90%",
-    maxWidth: 500,
     maxHeight: "80%",
-    zIndex: 1,
   },
-  modalTitle: {
-    fontSize: 20,
+  title: {
+    fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
   },
-  detailRow: {
-    flexDirection: "row",
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+  infoContainer: {
+    marginBottom: 15,
   },
-  detailLabel: {
-    flex: 1,
+  label: {
+    fontSize: 16,
     fontWeight: "500",
+    marginBottom: 5,
+    color: "#666",
   },
-  detailValue: {
-    flex: 2,
+  value: {
+    fontSize: 18,
+    color: "#333",
   },
-  modalActions: {
+  buttonContainer: {
     flexDirection: "row",
     justifyContent: "flex-end",
     gap: 10,
     marginTop: 20,
   },
-  modalButton: {
-    minWidth: 100,
+  button: {
+    flex: 1,
   },
 });
 

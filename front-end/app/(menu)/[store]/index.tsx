@@ -15,7 +15,7 @@ interface MenuList {
   itemSoldout: boolean;
   itemCategory: string;
   itemSubCategory: string;
-  itemImage: string;
+  itemPictureUrl: string;
 }
 
 export default function StoreMenu() {
@@ -63,6 +63,7 @@ export default function StoreMenu() {
       setSelectedSubCategory(getSubCategory(menuList)[0]);
     }
   }, [menuList]);
+  console.log(JSON.stringify(menuList, null, 2));
 
   if (isLoading)
     return (

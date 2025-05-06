@@ -36,6 +36,7 @@ const AdminOrderPage = () => {
     data: orders,
     isLoading,
     isError,
+    refetch,
   } = useQuery<Order[]>({
     queryKey: ["orders"],
     queryFn: fetchOrders,
@@ -47,7 +48,10 @@ const AdminOrderPage = () => {
       `${process.env.EXPO_PUBLIC_BASE_URL}/api/orders/admin/${orderId}?status=${status}`
     );
     const data = await response.json();
-    console.log(data);
+    console.log("data", data);
+    if (data.success) {
+      refetch();
+    }
   };
 
   if (isLoading) {
@@ -108,7 +112,7 @@ const AdminOrderPage = () => {
                   <Text style={styles.orderCustomer}>주문자: {"test123"}</Text>
                   <View style={styles.orderMenuContainer}>
                     {order.orderMenus.map((menu) => (
-                      <View style={{ gap: 10 }}>
+                      <View style={{ gap: 10 }} key={menu.itemName}>
                         <View
                           style={{
                             flexDirection: "row",

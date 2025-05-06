@@ -34,7 +34,7 @@ export type MenuItem = {
   itemSoldout: boolean;
   detail: MenuItemDetail;
   optionCategories: OptionCategory[];
-  itemImage: string;
+  itemPictureUrl: string;
 };
 
 export type MenuItemDetail = {

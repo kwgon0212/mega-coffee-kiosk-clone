@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,387 +7,301 @@ import {
   Modal,
   TextInput,
   Pressable,
+  Alert,
 } from "react-native";
 import Button from "@/components/Button";
+import { useQuery } from "@tanstack/react-query";
 
-export interface MenuFormData {
-  name: string;
-  price: string;
-  description: string;
-  imageUrl: string;
-  category: string;
-  options: string[];
-  nutrition: {
-    kcal: string;
-    natrium: string;
-    carbohydrate: string;
-    sugar: string;
-    fat: string;
-    transFat: string;
-    protein: string;
-    caffeine: string;
-    allergy: string[];
-  };
+interface Option {
+  optionName: string;
+  optionPrice: number;
+  optionOrder: number;
+  optionAvailable: boolean;
+}
+
+interface OptionCategory {
+  categoryName: string;
+  categoryDescription: string;
+  categoryOrder: number;
+  options: Option[];
+}
+
+interface MenuFormData {
+  itemId?: string;
+  itemName: string;
+  itemCategory: string;
+  itemSubCategory: string;
+  itemMenuDetail: string;
+  itemMakeTime: number;
+  itemPrice: number;
+  itemPictureUrl: string;
+  detailKcal: number;
+  detailNa: number;
+  detailGain: number;
+  detailSugar: number;
+  detailSatfat: number;
+  detailTransfat: number;
+  detailProtein: number;
+  detailCaffeine: number;
+  optionCategories: any[];
 }
 
 interface AddMenuModalProps {
   isVisible: boolean;
   onClose: () => void;
   onSubmit: (data: MenuFormData) => void;
-  categories: string[];
+  itemId?: string;
+  isEdit?: boolean;
 }
-
-const initialFormData: MenuFormData = {
-  name: "",
-  price: "",
-  description: "",
-  imageUrl: "",
-  category: "커피",
-  options: [],
-  nutrition: {
-    kcal: "",
-    natrium: "",
-    carbohydrate: "",
-    sugar: "",
-    fat: "",
-    transFat: "",
-    protein: "",
-    caffeine: "",
-    allergy: [],
-  },
-};
 
 const AddMenuModal = ({
   isVisible,
   onClose,
   onSubmit,
-  categories,
+  itemId,
+  isEdit = false,
 }: AddMenuModalProps) => {
-  const [formData, setFormData] = useState<MenuFormData>(initialFormData);
-  const [newOption, setNewOption] = useState("");
+  const [formData, setFormData] = useState<MenuFormData>({
+    itemName: "",
+    itemCategory: "coffee",
+    itemSubCategory: "",
+    itemMenuDetail: "",
+    itemMakeTime: 0,
+    itemPrice: 0,
+    itemPictureUrl: "",
+    detailKcal: 0,
+    detailNa: 0,
+    detailGain: 0,
+    detailSugar: 0,
+    detailSatfat: 0,
+    detailTransfat: 0,
+    detailProtein: 0,
+    detailCaffeine: 0,
+    optionCategories: [],
+  });
 
-  const handleAddOption = () => {
-    if (newOption.trim()) {
-      setFormData({
-        ...formData,
-        options: [...formData.options, newOption.trim()],
-      });
-      setNewOption("");
+  const { data: menuDetail } = useQuery({
+    queryKey: ["menuDetail", itemId],
+    queryFn: async () => {
+      if (!itemId) return null;
+      const response = await fetch(`/api/menus/item/${itemId}`);
+      if (!response.ok) throw new Error("메뉴 정보를 가져오는데 실패했습니다.");
+      const data = await response.json();
+      console.log("API 응답 데이터:", data);
+      return data;
+    },
+    enabled: isEdit && !!itemId,
+  });
+
+  useEffect(() => {
+    if (menuDetail) {
+      const updatedFormData = {
+        itemName: menuDetail.itemName,
+        itemCategory: menuDetail.itemCategory || "coffee",
+        itemSubCategory: menuDetail.itemSubCategory || "",
+        itemMenuDetail: menuDetail.itemMenuDetail || "",
+        itemMakeTime: menuDetail.itemMakeTime || 0,
+        itemPrice: menuDetail.itemPrice || 0,
+        itemPictureUrl: menuDetail.itemPictureUrl || "",
+        detailKcal: menuDetail.detail?.detailKcal || 0,
+        detailNa: menuDetail.detail?.detailNa || 0,
+        detailGain: menuDetail.detail?.detailGain || 0,
+        detailSugar: menuDetail.detail?.detailSugar || 0,
+        detailSatfat: menuDetail.detail?.detailSatfat || 0,
+        detailTransfat: menuDetail.detail?.detailTransfat || 0,
+        detailProtein: menuDetail.detail?.detailProtein || 0,
+        detailCaffeine: menuDetail.detail?.detailCaffeine || 0,
+        optionCategories: menuDetail.optionCategories || [],
+      };
+
+      console.log("업데이트된 폼 데이터:", updatedFormData);
+      setFormData(updatedFormData);
     }
-  };
-
-  const handleRemoveOption = (index: number) => {
-    setFormData({
-      ...formData,
-      options: formData.options.filter((_, i) => i !== index),
-    });
-  };
+  }, [menuDetail]);
 
   const handleSubmit = () => {
+    if (!formData.itemName || !formData.itemPrice || !formData.itemPictureUrl) {
+      Alert.alert("입력 오류", "필수 항목을 모두 입력해주세요.");
+      return;
+    }
     onSubmit(formData);
-    setFormData(initialFormData);
   };
 
   return (
-    <Modal visible={isVisible} animationType="slide" transparent={true}>
+    <Modal visible={isVisible} animationType="slide" transparent>
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-          <ScrollView
-            style={styles.modalScroll}
-            showsVerticalScrollIndicator={false}
-          >
-            <Text style={styles.modalTitle}>새 메뉴 추가</Text>
+          <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
+            <Text style={styles.title}>
+              {isEdit ? "메뉴 수정" : "새 메뉴 추가"}
+            </Text>
 
-            {/* 기본 정보 */}
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>메뉴명</Text>
-              <TextInput
-                style={styles.input}
-                value={formData.name}
-                onChangeText={(text) =>
-                  setFormData({ ...formData, name: text })
-                }
-                placeholder="메뉴명을 입력하세요"
-              />
-            </View>
+            <Text style={styles.label}>메뉴 이름</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.itemName}
+              onChangeText={(text) =>
+                setFormData({ ...formData, itemName: text })
+              }
+              placeholder="메뉴 이름을 입력하세요"
+            />
 
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>가격</Text>
-              <TextInput
-                style={styles.input}
-                value={formData.price}
-                onChangeText={(text) =>
-                  setFormData({ ...formData, price: text })
-                }
-                placeholder="가격을 입력하세요"
-                keyboardType="numeric"
-              />
-            </View>
+            <Text style={styles.label}>가격</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.itemPrice.toString()}
+              onChangeText={(text) =>
+                setFormData({ ...formData, itemPrice: Number(text) })
+              }
+              keyboardType="numeric"
+              placeholder="가격을 입력하세요"
+            />
 
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>설명</Text>
-              <TextInput
-                style={[styles.input, styles.textArea]}
-                value={formData.description}
-                onChangeText={(text) =>
-                  setFormData({ ...formData, description: text })
-                }
-                placeholder="메뉴 설명을 입력하세요"
-                multiline
-                numberOfLines={3}
-              />
-            </View>
+            <Text style={styles.label}>이미지 URL</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.itemPictureUrl}
+              onChangeText={(text) =>
+                setFormData({ ...formData, itemPictureUrl: text })
+              }
+              placeholder="이미지 URL을 입력하세요"
+            />
 
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>카테고리</Text>
-              <View style={styles.categoryButtonGroup}>
-                {categories.map((category) => (
-                  <Pressable
-                    key={category}
-                    style={[
-                      styles.categoryButton,
-                      formData.category === category && styles.selectedCategory,
-                    ]}
-                    onPress={() =>
-                      setFormData({ ...formData, category: category })
-                    }
-                  >
-                    <Text
-                      style={[
-                        styles.categoryText,
-                        formData.category === category &&
-                          styles.selectedCategoryText,
-                      ]}
-                    >
-                      {category}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-            </View>
+            <Text style={styles.label}>서브 카테고리</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.itemSubCategory}
+              onChangeText={(text) =>
+                setFormData({ ...formData, itemSubCategory: text })
+              }
+              placeholder="서브 카테고리를 입력하세요"
+            />
 
-            {/* 옵션 추가 */}
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>옵션</Text>
-              <View style={styles.optionInputContainer}>
-                <TextInput
-                  style={[styles.input, styles.optionInput]}
-                  value={newOption}
-                  onChangeText={setNewOption}
-                  placeholder="옵션을 입력하세요"
-                />
-                <Button
-                  text="추가"
-                  onPress={handleAddOption}
-                  style={styles.optionAddButton}
-                />
-              </View>
-              <View style={styles.optionList}>
-                {formData.options.map((option, index) => (
-                  <View key={index} style={styles.optionItem}>
-                    <Text>{option}</Text>
-                    <Pressable
-                      onPress={() => handleRemoveOption(index)}
-                      style={styles.optionRemoveButton}
-                    >
-                      <Text style={styles.optionRemoveText}>×</Text>
-                    </Pressable>
-                  </View>
-                ))}
-              </View>
-            </View>
+            <Text style={styles.label}>메뉴 설명</Text>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              value={formData.itemMenuDetail}
+              onChangeText={(text) =>
+                setFormData({ ...formData, itemMenuDetail: text })
+              }
+              placeholder="메뉴 설명을 입력하세요"
+              multiline
+              numberOfLines={3}
+            />
 
-            {/* 영양성분 */}
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>영양성분</Text>
-              <View style={styles.nutritionGrid}>
-                <View style={styles.nutritionItem}>
-                  <Text style={styles.nutritionLabel}>칼로리(kcal)</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={formData.nutrition.kcal}
-                    onChangeText={(text) =>
-                      setFormData({
-                        ...formData,
-                        nutrition: { ...formData.nutrition, kcal: text },
-                      })
-                    }
-                    keyboardType="numeric"
-                  />
-                </View>
-                <View style={styles.nutritionItem}>
-                  <Text style={styles.nutritionLabel}>나트륨(mg)</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={formData.nutrition.natrium}
-                    onChangeText={(text) =>
-                      setFormData({
-                        ...formData,
-                        nutrition: { ...formData.nutrition, natrium: text },
-                      })
-                    }
-                    keyboardType="numeric"
-                  />
-                </View>
-                <View style={styles.nutritionItem}>
-                  <Text style={styles.nutritionLabel}>탄수화물(g)</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={formData.nutrition.carbohydrate}
-                    onChangeText={(text) =>
-                      setFormData({
-                        ...formData,
-                        nutrition: {
-                          ...formData.nutrition,
-                          carbohydrate: text,
-                        },
-                      })
-                    }
-                    keyboardType="numeric"
-                  />
-                </View>
-                <View style={styles.nutritionItem}>
-                  <Text style={styles.nutritionLabel}>당류(g)</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={formData.nutrition.sugar}
-                    onChangeText={(text) =>
-                      setFormData({
-                        ...formData,
-                        nutrition: { ...formData.nutrition, sugar: text },
-                      })
-                    }
-                    keyboardType="numeric"
-                  />
-                </View>
-                <View style={styles.nutritionItem}>
-                  <Text style={styles.nutritionLabel}>지방(g)</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={formData.nutrition.fat}
-                    onChangeText={(text) =>
-                      setFormData({
-                        ...formData,
-                        nutrition: { ...formData.nutrition, fat: text },
-                      })
-                    }
-                    keyboardType="numeric"
-                  />
-                </View>
-                <View style={styles.nutritionItem}>
-                  <Text style={styles.nutritionLabel}>트랜스지방(g)</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={formData.nutrition.transFat}
-                    onChangeText={(text) =>
-                      setFormData({
-                        ...formData,
-                        nutrition: { ...formData.nutrition, transFat: text },
-                      })
-                    }
-                    keyboardType="numeric"
-                  />
-                </View>
-                <View style={styles.nutritionItem}>
-                  <Text style={styles.nutritionLabel}>단백질(g)</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={formData.nutrition.protein}
-                    onChangeText={(text) =>
-                      setFormData({
-                        ...formData,
-                        nutrition: { ...formData.nutrition, protein: text },
-                      })
-                    }
-                    keyboardType="numeric"
-                  />
-                </View>
-                <View style={styles.nutritionItem}>
-                  <Text style={styles.nutritionLabel}>카페인(mg)</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={formData.nutrition.caffeine}
-                    onChangeText={(text) =>
-                      setFormData({
-                        ...formData,
-                        nutrition: { ...formData.nutrition, caffeine: text },
-                      })
-                    }
-                    keyboardType="numeric"
-                  />
-                </View>
-              </View>
+            <Text style={styles.label}>제조 시간 (초)</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.itemMakeTime.toString()}
+              onChangeText={(text) =>
+                setFormData({ ...formData, itemMakeTime: Number(text) })
+              }
+              keyboardType="numeric"
+              placeholder="제조 시간을 입력하세요"
+            />
 
-              {/* 알레르기 정보 */}
-              <View style={[styles.formGroup, { marginTop: 10 }]}>
-                <Text style={styles.nutritionLabel}>알레르기 유발 성분</Text>
-                <View style={styles.optionInputContainer}>
-                  <TextInput
-                    style={[styles.input, styles.optionInput]}
-                    value={newOption}
-                    onChangeText={setNewOption}
-                    placeholder="알레르기 유발 성분을 입력하세요"
-                  />
-                  <Button
-                    text="추가"
-                    onPress={() => {
-                      if (newOption.trim()) {
-                        setFormData({
-                          ...formData,
-                          nutrition: {
-                            ...formData.nutrition,
-                            allergy: [
-                              ...formData.nutrition.allergy,
-                              newOption.trim(),
-                            ],
-                          },
-                        });
-                        setNewOption("");
-                      }
-                    }}
-                    style={styles.optionAddButton}
-                  />
-                </View>
-                <View style={styles.optionList}>
-                  {formData.nutrition.allergy.map((item, index) => (
-                    <View key={index} style={styles.optionItem}>
-                      <Text>{item}</Text>
-                      <Pressable
-                        onPress={() => {
-                          setFormData({
-                            ...formData,
-                            nutrition: {
-                              ...formData.nutrition,
-                              allergy: formData.nutrition.allergy.filter(
-                                (_, i) => i !== index
-                              ),
-                            },
-                          });
-                        }}
-                        style={styles.optionRemoveButton}
-                      >
-                        <Text style={styles.optionRemoveText}>×</Text>
-                      </Pressable>
-                    </View>
-                  ))}
-                </View>
-              </View>
-            </View>
+            <Text style={styles.sectionTitle}>영양 정보</Text>
 
-            <View style={styles.modalActions}>
+            <Text style={styles.label}>칼로리 (kcal)</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.detailKcal.toString()}
+              onChangeText={(text) =>
+                setFormData({ ...formData, detailKcal: Number(text) })
+              }
+              keyboardType="numeric"
+              placeholder="칼로리를 입력하세요"
+            />
+
+            <Text style={styles.label}>나트륨 (mg)</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.detailNa.toString()}
+              onChangeText={(text) =>
+                setFormData({ ...formData, detailNa: Number(text) })
+              }
+              keyboardType="numeric"
+              placeholder="나트륨을 입력하세요"
+            />
+
+            <Text style={styles.label}>탄수화물 (g)</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.detailGain.toString()}
+              onChangeText={(text) =>
+                setFormData({ ...formData, detailGain: Number(text) })
+              }
+              keyboardType="numeric"
+              placeholder="탄수화물을 입력하세요"
+            />
+
+            <Text style={styles.label}>당류 (g)</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.detailSugar.toString()}
+              onChangeText={(text) =>
+                setFormData({ ...formData, detailSugar: Number(text) })
+              }
+              keyboardType="numeric"
+              placeholder="당류를 입력하세요"
+            />
+
+            <Text style={styles.label}>포화지방 (g)</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.detailSatfat.toString()}
+              onChangeText={(text) =>
+                setFormData({ ...formData, detailSatfat: Number(text) })
+              }
+              keyboardType="numeric"
+              placeholder="포화지방을 입력하세요"
+            />
+
+            <Text style={styles.label}>트랜스지방 (g)</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.detailTransfat.toString()}
+              onChangeText={(text) =>
+                setFormData({ ...formData, detailTransfat: Number(text) })
+              }
+              keyboardType="numeric"
+              placeholder="트랜스지방을 입력하세요"
+            />
+
+            <Text style={styles.label}>단백질 (g)</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.detailProtein.toString()}
+              onChangeText={(text) =>
+                setFormData({ ...formData, detailProtein: Number(text) })
+              }
+              keyboardType="numeric"
+              placeholder="단백질을 입력하세요"
+            />
+
+            <Text style={styles.label}>카페인 (mg)</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.detailCaffeine.toString()}
+              onChangeText={(text) =>
+                setFormData({ ...formData, detailCaffeine: Number(text) })
+              }
+              keyboardType="numeric"
+              placeholder="카페인을 입력하세요"
+            />
+
+            <View style={styles.buttonContainer}>
               <Button
                 text="취소"
-                onPress={() => {
-                  onClose();
-                  setFormData(initialFormData);
-                }}
-                style={styles.modalButton}
-                backgroundColor="#888"
+                onPress={onClose}
+                style={styles.button}
+                backgroundColor="#e8e4e0"
+                color="#452613"
               />
               <Button
-                text="저장"
+                text={isEdit ? "수정" : "추가"}
                 onPress={handleSubmit}
-                style={styles.modalButton}
+                style={styles.button}
                 backgroundColor="#452613"
                 color="white"
               />
@@ -407,109 +321,46 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    width: "90%",
-    maxHeight: "70%",
     backgroundColor: "white",
     borderRadius: 10,
     padding: 20,
+    width: "90%",
+    maxHeight: "80%",
   },
-  modalScroll: {
-    maxHeight: "100%",
-  },
-  modalTitle: {
+  title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
   },
-  formGroup: {
-    marginBottom: 20,
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginTop: 20,
+    marginBottom: 15,
   },
   label: {
     fontSize: 16,
     fontWeight: "500",
-    marginBottom: 8,
+    marginBottom: 5,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
+    borderColor: "#ccc",
+    borderRadius: 5,
     padding: 10,
-    fontSize: 16,
+    marginBottom: 15,
   },
   textArea: {
     height: 100,
     textAlignVertical: "top",
   },
-  categoryButtonGroup: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-  },
-  categoryButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    backgroundColor: "#F5F5F5",
-  },
-  selectedCategory: {
-    backgroundColor: "#452613",
-  },
-  categoryText: {
-    fontSize: 16,
-    color: "#666",
-  },
-  selectedCategoryText: {
-    color: "white",
-  },
-  optionInputContainer: {
-    flexDirection: "row",
-    gap: 10,
-    marginBottom: 10,
-  },
-  optionInput: {
-    flex: 1,
-  },
-  optionAddButton: {
-    width: 80,
-  },
-  optionList: {
-    gap: 8,
-  },
-  optionItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "#f5f5f5",
-    padding: 10,
-    borderRadius: 8,
-  },
-  optionRemoveButton: {
-    padding: 5,
-  },
-  optionRemoveText: {
-    fontSize: 20,
-    color: "#ff4444",
-  },
-  nutritionGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-  },
-  nutritionItem: {
-    flex: 1,
-    minWidth: "45%",
-  },
-  nutritionLabel: {
-    fontSize: 14,
-    marginBottom: 5,
-  },
-  modalActions: {
+  buttonContainer: {
     flexDirection: "row",
     justifyContent: "flex-end",
     gap: 10,
     marginTop: 20,
   },
-  modalButton: {
+  button: {
     flex: 1,
   },
 });
