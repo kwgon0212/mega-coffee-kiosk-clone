@@ -64,7 +64,14 @@ const SignupPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          name: formData.name,
+          account: formData.account,
+          password: formData.password,
+          birth: formData.birth,
+          phoneNumber: formData.phoneNumber,
+          nickName: formData.nickName,
+        }),
       }
     );
 

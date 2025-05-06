@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import Button from "@/components/Button";
+import * as SecureStore from "expo-secure-store";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Login() {
   const [account, setAccount] = useState("");
@@ -26,12 +28,12 @@ export default function Login() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ account, password, provider: "local" }),
+        body: JSON.stringify({ account, password, provider: "LOCAL" }),
       }
     );
 
     const data = await response.json();
-    console.log("data", data);
+    console.log(JSON.stringify(data, null, 2));
 
     if (!response.ok) {
       Alert.alert(
@@ -41,6 +43,11 @@ export default function Login() {
       );
       return;
     }
+
+    await SecureStore.setItemAsync("accessToken", data.accessToken);
+    await SecureStore.setItemAsync("refreshToken", data.refreshToken);
+
+    await AsyncStorage.setItem("userInfo", JSON.stringify(data.userInfo));
 
     router.replace("/(store)");
   };

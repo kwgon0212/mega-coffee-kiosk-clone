@@ -3,7 +3,7 @@ import Button from "@/components/Button";
 import Checkbox from "@/components/Checkbox";
 import Layout from "@/components/ui/Layout";
 import Entypo from "@expo/vector-icons/Entypo";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -12,10 +12,12 @@ import {
   Pressable,
   ScrollView,
   Image,
+  Alert,
 } from "react-native";
 import BottomSheet from "./BottomSheet";
 import { useCartStore } from "@/store/useCartStore";
 import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CouponBottomSheet = BottomSheet;
 
@@ -35,38 +37,54 @@ const OrderPage = () => {
   );
 
   const handlePay = async () => {
-    console.log("storeRequest", storeRequest);
-    console.log("isTakeout", isTakeout);
-    console.log("packageOption", packageOption);
-    console.log("paymentMethod", paymentMethod);
-    console.log("cart", JSON.stringify(cart, null, 2));
+    const userInfoItem = await AsyncStorage.getItem("userInfo");
+    const userInfo = JSON.parse(userInfoItem || "{}");
+
+    if (Object.keys(userInfo).length === 0) return;
 
     const response = await fetch(
-      `${process.env.EXPO_PUBLIC_BASE_URL}/api/orders/123`,
+      `${process.env.EXPO_PUBLIC_BASE_URL}/api/orders/${userInfo.userId}`,
       {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
-          discount_price: 0,
-          is_take_out: isTakeout,
-          item_make_time: 5,
-          member_id: 123,
-          nickname: "test",
-          order_count: 1,
-          order_date: new Date(),
-          package_option: packageOption,
-          payment_method: paymentMethod,
-          request_message: storeRequest,
-          store_name: cart[0].store,
-          total_price: totalPrice,
+          items: cart.map((item) => {
+            return {
+              itemName: item.name,
+              itemPrice: item.price, // item.perTotalPrice(옵션 추가된 가격), item.price(default 가격) 둘중에 어떤거?
+              quantity: item.quantity,
+              options: item.options,
+            };
+          }),
+          storeName: cart[0].store,
+          requestMessage: storeRequest,
+          takeout: isTakeout,
+          packageOption: packageOption.join(""), // 배열로 저장한거 수정해야함
+          discountPrice: 0,
+          paymentMethod,
+          nickname: userInfo.nickname,
+          itemMakeTime: 5, // (menu)/[store]/[menuId]에서 카트에 저장할때 makeTime도 같이 저장해야함
         }),
       }
     );
     const data = await response.json();
-    console.log("success", data.success);
-    console.log("message", data.message);
-    console.log("orderNumber", data.orderNumber);
-    // clearCart();
-    // router.push("/(order)/list/123");
+    console.log("data", data);
+
+    if (!data.success) {
+      Alert.alert(data.message || data.error || "주문 실패");
+      router.back();
+      return;
+    }
+
+    clearCart();
+    setStoreRequest("");
+    setIsTakeout(true);
+    setPackageOption([]);
+    setPaymentMethod("메가선불카드");
+    router.replace(`/(order)/list/${data.orderNumber}`);
+    return;
   };
 
   return (
@@ -95,18 +113,16 @@ const OrderPage = () => {
                 />
                 <View style={styles.cartListCardInfo}>
                   <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-                    {item.name}
+                    {item.name} x{item.quantity}
                   </Text>
                   <View style={{ gap: 5 }}>
                     {item.isUseTumbler && <Text>텀블러(개인컵) 사용</Text>}
                     {item.selectedShot !== null && (
                       <Text>{item.selectedShot}</Text>
                     )}
-                    {Object.entries(item.options)
-                      .filter(([_, value]) => value === true)
-                      .map(([key]) => (
-                        <Text key={key}>{key}</Text>
-                      ))}
+                    {item.options.map((option) => (
+                      <Text key={option.optionName}>{option.optionName}</Text>
+                    ))}
                   </View>
                 </View>
               </View>

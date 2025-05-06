@@ -1,6 +1,6 @@
 import Button from "@/components/Button";
 import { router } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
 
 const LandingPage = () => {
@@ -17,7 +17,7 @@ const LandingPage = () => {
         <Button
           text="로그인 / 회원가입"
           onPress={() => {
-            router.push("/(auth)");
+            router.replace("/(auth)");
           }}
         />
       </View>
@@ -51,5 +51,4 @@ const styles = StyleSheet.create({
     gap: 16,
   },
 });
-
 export default LandingPage;

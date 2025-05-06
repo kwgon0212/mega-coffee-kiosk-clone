@@ -164,6 +164,20 @@ const MenuDetailPage = () => {
   const handleOrder = () => {
     if (!menu) return;
 
+    const selectedOptions = Object.entries(optionState)
+      .filter(([_, checked]) => checked)
+      .map(([optionName]) => {
+        const found = menu.optionCategories
+          .flatMap((cat) => cat.options)
+          .find((opt) => opt.optionName === optionName);
+        return found
+          ? { optionName: found.optionName, optionPrice: found.optionPrice }
+          : null;
+      })
+      .filter(
+        (v): v is { optionName: string; optionPrice: number } => v !== null
+      );
+
     const cartItem: CartItem = {
       id: Number(menuId),
       store,
@@ -172,7 +186,7 @@ const MenuDetailPage = () => {
       image: menu.itemImage || "",
       isUseTumbler,
       selectedShot,
-      options: optionState,
+      options: selectedOptions,
       price: menu.itemPrice,
       perTotalPrice: totalPrice,
       createdCartItemAt: new Date(),
@@ -186,6 +200,20 @@ const MenuDetailPage = () => {
     if (!menu) return;
 
     Toast.show({ type: "successAddCart" });
+    const selectedOptions = Object.entries(optionState)
+      .filter(([_, checked]) => checked)
+      .map(([optionName]) => {
+        const found = menu.optionCategories
+          .flatMap((cat) => cat.options)
+          .find((opt) => opt.optionName === optionName);
+        return found
+          ? { optionName: found.optionName, optionPrice: found.optionPrice }
+          : null;
+      })
+      .filter(
+        (v): v is { optionName: string; optionPrice: number } => v !== null
+      );
+
     const cartItem: CartItem = {
       id: Number(menuId),
       store,
@@ -194,7 +222,7 @@ const MenuDetailPage = () => {
       image: menu.itemImage || "",
       isUseTumbler,
       selectedShot,
-      options: optionState,
+      options: selectedOptions,
       price: menu.itemPrice,
       perTotalPrice: totalPrice,
       createdCartItemAt: new Date(),
@@ -202,13 +230,6 @@ const MenuDetailPage = () => {
     addToCart(cartItem);
     resetState();
   };
-
-  // console.log(JSON.stringify(isUsePersonal, null, 2));
-  console.log(selectedShot);
-
-  useEffect(() => {
-    console.log("optionState 변경됨:", JSON.stringify(optionState, null, 2));
-  }, [optionState]);
 
   if (isLoading || !menu) {
     return (
