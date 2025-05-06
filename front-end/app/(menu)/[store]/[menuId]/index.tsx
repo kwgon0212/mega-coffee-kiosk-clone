@@ -183,7 +183,7 @@ const MenuDetailPage = () => {
       store,
       name: menu.itemName,
       quantity,
-      image: menu.itemImage || "",
+      image: menu.itemPictureUrl || "",
       isUseTumbler,
       selectedShot,
       options: selectedOptions,
@@ -219,7 +219,7 @@ const MenuDetailPage = () => {
       store,
       name: menu.itemName,
       quantity,
-      image: menu.itemImage || "",
+      image: menu.itemPictureUrl || "",
       isUseTumbler,
       selectedShot,
       options: selectedOptions,
@@ -259,7 +259,7 @@ const MenuDetailPage = () => {
           onPress={() => setIsOpenInfoModal(true)}
         >
           <View>
-            {/* <Image source={{ uri: menu.itemImage }} style={styles.image} /> */}
+            <Image source={{ uri: menu.itemPictureUrl }} style={styles.image} />
             <MaterialCommunityIcons
               style={{
                 position: "absolute",
