@@ -70,7 +70,7 @@ export interface CartItem {
   image: string;
   isUseTumbler: boolean;
   selectedShot: string | null;
-  options: Record<string, boolean>;
+  options: { optionName: string; optionPrice: number }[];
   perTotalPrice: number;
   createdCartItemAt: Date;
 }

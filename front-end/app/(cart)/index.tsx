@@ -27,7 +27,7 @@ const CartPage = () => {
           {
             text: "확인",
             onPress: () => {
-              router.push("/(menu)/중구중림점");
+              router.replace("/(menu)/중구중림점");
             },
           },
         ],
@@ -78,11 +78,9 @@ const CartPage = () => {
                 <View style={{ gap: 5 }}>
                   {item.isUseTumbler && <Text>텀블러(개인컵) 사용</Text>}
                   {item.selectedShot && <Text>{item.selectedShot} x1</Text>}
-                  {Object.entries(item.options)
-                    .filter(([_, value]) => value === true)
-                    .map(([key]) => (
-                      <Text key={key}>{key} x1</Text>
-                    ))}
+                  {item.options.map((option) => (
+                    <Text key={option.optionName}>{option.optionName} x1</Text>
+                  ))}
                 </View>
 
                 <View style={styles.orderContainer}>
@@ -146,7 +144,7 @@ const CartPage = () => {
           <Button
             text="주문하기"
             onPress={() => {
-              router.push("/(order)");
+              router.replace("/(order)");
             }}
             backgroundColor="#452613"
             color="white"

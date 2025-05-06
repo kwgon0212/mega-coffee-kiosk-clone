@@ -72,7 +72,7 @@ const StorePage = () => {
         <View style={{ flexDirection: "row" }}>
           <Text style={styles.storeCount}>내 주변에 </Text>
           <View style={{ position: "relative" }}>
-            <Text style={styles.storeCount}>{10}개의 매장</Text>
+            <Text style={styles.storeCount}>{storeList.length}개의 매장</Text>
             <View style={styles.highlight} />
           </View>
           <Text style={styles.storeCount}>이 있습니다.</Text>

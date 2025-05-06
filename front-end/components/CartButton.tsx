@@ -7,7 +7,7 @@ const CartButton = ({ color = "black" }: { color?: string }) => {
   const { count } = useCartStore();
 
   const handlePressCart = () => {
-    router.push("/(cart)");
+    router.replace("/(cart)");
   };
 
   return (
