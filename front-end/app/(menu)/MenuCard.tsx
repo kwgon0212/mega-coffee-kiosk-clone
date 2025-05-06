@@ -14,7 +14,7 @@ const MenuCard = ({
     itemSoldout: boolean;
     itemCategory: string;
     itemSubCategory: string;
-    itemImage: string;
+    itemPictureUrl: string;
   };
   filter: number;
   onPress: () => void;
@@ -25,8 +25,11 @@ const MenuCard = ({
         style={[styles.container, { flexBasis: `${100 / filter}%` }]}
         onPress={onPress}
       >
-        {menu.itemImage ? (
-          <Image source={{ uri: menu.itemImage }} style={styles.menuImage} />
+        {menu.itemPictureUrl ? (
+          <Image
+            source={{ uri: menu.itemPictureUrl }}
+            style={styles.menuImage}
+          />
         ) : (
           <View style={styles.menuImage}>
             <MaterialIcons name="image" size={24} color="black" />
@@ -52,7 +55,7 @@ const MenuCard = ({
       ]}
       onPress={onPress}
     >
-      <Image source={{ uri: menu.itemImage }} style={styles.menuImage} />
+      <Image source={{ uri: menu.itemPictureUrl }} style={styles.menuImage} />
       <View style={{ flex: 1, gap: 10 }}>
         <Text style={styles.name}>{menu.itemName}</Text>
         <Text style={styles.price}>{menu.itemPrice.toLocaleString()}원</Text>
