@@ -3,6 +3,7 @@ package com.megacoffee.kiosk.item.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -15,9 +16,10 @@ public class MenuCreateRequest {
     private String itemCategory;
     private String itemSubCategory;
     private String itemMenuDetail;
-    private Integer itemMakeTime;
     private Integer itemPrice;
     private boolean itemSoldout;
+    private Integer itemMakeTime;
+    private MultipartFile itemImage;
 
     // Detail 정보
     private float detailKcal;

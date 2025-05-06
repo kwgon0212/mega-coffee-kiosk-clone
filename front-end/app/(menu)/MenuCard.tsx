@@ -1,3 +1,4 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import React from "react";
 import { Text, Image, StyleSheet, View, Pressable } from "react-native";
 
@@ -6,7 +7,15 @@ const MenuCard = ({
   filter,
   onPress,
 }: {
-  menu: { name: string; price: number; image: string };
+  menu: {
+    itemId: number;
+    itemName: string;
+    itemPrice: number;
+    itemSoldout: boolean;
+    itemCategory: string;
+    itemSubCategory: string;
+    itemImage: string;
+  };
   filter: number;
   onPress: () => void;
 }) => {
@@ -16,9 +25,17 @@ const MenuCard = ({
         style={[styles.container, { flexBasis: `${100 / filter}%` }]}
         onPress={onPress}
       >
-        <Image source={{ uri: menu.image }} style={styles.menuImage} />
-        <Text style={[styles.name, { textAlign: "center" }]}>{menu.name}</Text>
-        <Text style={styles.price}>{menu.price.toLocaleString()}원</Text>
+        {menu.itemImage ? (
+          <Image source={{ uri: menu.itemImage }} style={styles.menuImage} />
+        ) : (
+          <View style={styles.menuImage}>
+            <MaterialIcons name="image" size={24} color="black" />
+          </View>
+        )}
+        <Text style={[styles.name, { textAlign: "center" }]}>
+          {menu.itemName}
+        </Text>
+        <Text style={styles.price}>{menu.itemPrice.toLocaleString()}원</Text>
       </Pressable>
     );
   }
@@ -35,10 +52,10 @@ const MenuCard = ({
       ]}
       onPress={onPress}
     >
-      <Image source={{ uri: menu.image }} style={styles.menuImage} />
+      <Image source={{ uri: menu.itemImage }} style={styles.menuImage} />
       <View style={{ flex: 1, gap: 10 }}>
-        <Text style={styles.name}>{menu.name}</Text>
-        <Text style={styles.price}>{menu.price.toLocaleString()}원</Text>
+        <Text style={styles.name}>{menu.itemName}</Text>
+        <Text style={styles.price}>{menu.itemPrice.toLocaleString()}원</Text>
       </View>
     </Pressable>
   );
@@ -54,6 +71,11 @@ const styles = StyleSheet.create({
   menuImage: {
     width: 100,
     height: 100,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "gray",
+    borderRadius: 10,
   },
   price: {
     fontWeight: "bold",
