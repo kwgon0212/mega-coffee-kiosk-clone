@@ -2,6 +2,7 @@ package com.megacoffee.kiosk.order.adapter.inbound.web;
 
 import com.megacoffee.kiosk.global.response.SuccessResponse;
 import com.megacoffee.kiosk.order.adapter.inbound.web.dto.request.OrderRequestDto;
+import com.megacoffee.kiosk.order.adapter.inbound.web.dto.request.StatusRequestDto;
 import com.megacoffee.kiosk.order.adapter.inbound.web.dto.response.OrderCreateResponseDto;
 import com.megacoffee.kiosk.order.adapter.inbound.web.dto.response.AllOrderResponseDto;
 import com.megacoffee.kiosk.order.adapter.inbound.web.dto.response.SingleOrderResponseDto;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +31,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Tag(name = "Order API", description = "주문 관련 API")
 @RequestMapping("/api/orders")
+
 public class OrderController {
 
     private final CreateOrderUseCase createOrderUseCase;
@@ -95,10 +98,11 @@ public class OrderController {
     //== 특정 주문 상태 업데이트 ==//
     @Operation(summary = "주문 상태 업데이트" , description = "관리자가 주문 상태를 업데이트합니다.")
     @PutMapping("/admin/{orderId}")
-    public ResponseEntity<?> updateOrderStatus( @PathVariable UUID orderId, @RequestParam String status) {
+    public ResponseEntity<?> updateOrderStatus(@PathVariable UUID orderId, @RequestBody StatusRequestDto statusRequestDto) {
+        System.out.println("OrderController.updateOrderStatus");
         // 주문 상태 업데이트
-        OrderStatus newStatus = OrderStatus.valueOf(status.toUpperCase());
-        createOrderUseCase.changeOrderStatus(orderId, newStatus);
+        System.out.println("statusRequestDto = " + statusRequestDto.getOrderStatus());
+        createOrderUseCase.changeOrderStatus(orderId, statusRequestDto.getOrderStatus());
 
         // 주문 상태 업데이트 성공 응답
         return ResponseEntity.ok(SuccessResponse.success("주문 상태 업데이트에 성공하였습니다", null));
