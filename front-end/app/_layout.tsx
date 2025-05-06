@@ -32,11 +32,21 @@ export default function RootLayout() {
 
   const path = usePathname();
 
+  // useEffect(() => {
+  //   const clearAsyncStorage = async () => {
+  //     await SecureStore.deleteItemAsync("accessToken");
+  //   };
+  //   clearAsyncStorage();
+  // }, []);
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const accessToken = await SecureStore.getItemAsync("accessToken");
         const userInfo = await AsyncStorage.getItem("userInfo");
+
+        console.log("accessToken", accessToken);
+        console.log("userInfo", userInfo);
 
         const inAdminPage = segments[0] === "(admin)";
         const inAuthPage = segments[0] === "(auth)";
@@ -49,7 +59,8 @@ export default function RootLayout() {
         // 메뉴상세  segments ["(menu)", "[store]", "[menuId]"]
 
         if (!accessToken) {
-          if (segments.length > 0) router.replace("/");
+          // if (path === "signup") return;
+          // if (path !== "/") router.replace("/");
           return;
         }
 
@@ -77,7 +88,7 @@ export default function RootLayout() {
     };
 
     checkAuth();
-  }, [segments]);
+  }, [segments, path]);
 
   useEffect(() => {
     if (loaded) {

@@ -1,6 +1,6 @@
 import Button from "@/components/Button";
 import { router } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
 
 const LandingPage = () => {
