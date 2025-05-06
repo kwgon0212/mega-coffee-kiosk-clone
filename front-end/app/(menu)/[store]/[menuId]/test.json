@@ -1,109 +1,30 @@
 {
-  "itemName": "(ICE)메가리카노",
-  "itemMenuDetail": "깊고 진한 메가MGC커피 아메리카노를 960ml 더 큼직하게 즐길 수 있는 대용량 커피",
-  "itemPrice": 3300,
-  "itemMakeTime": 5,
-  "itemSoldout": false,
+  "itemName": "string",
+  "itemPictureUrl": "string",
+  "itemMenuDetail": "string",
+  "itemPrice": 0,
+  "itemMakeTime": 0,
+  "itemSoldout": true,
   "detail": {
-    "detailKcal": 16.7,
-    "detailNa": 0.7,
-    "detailGain": 2.1,
+    "detailKcal": 0,
+    "detailNa": 0,
+    "detailGain": 0,
     "detailSugar": 0,
     "detailSatfat": 0,
     "detailTransfat": 0,
-    "detailProtein": 1.5,
-    "detailCaffeine": 290.766
+    "detailProtein": 0,
+    "detailCaffeine": 0
   },
   "optionCategories": [
     {
-      "categoryName": "컵 선택",
-      "categoryDescription": "개인 텀블러 사용",
-      "categoryOrder": 1,
+      "categoryName": "string",
+      "categoryDescription": "string",
+      "categoryOrder": 0,
       "options": [
         {
-          "optionName": "텀블러(개인컵) 사용",
+          "optionName": "string",
           "optionPrice": 0,
-          "optionAvailable": true
-        }
-      ]
-    },
-    {
-      "categoryName": "샷 선택",
-      "categoryDescription": "샷 선택(메가리카노)",
-      "categoryOrder": 2,
-      "options": [
-        {
-          "optionName": "연하게",
-          "optionPrice": 0,
-          "optionAvailable": true
-        },
-        {
-          "optionName": "샷 추가 + 600원",
-          "optionPrice": 600,
-          "optionAvailable": true
-        },
-        {
-          "optionName": "2샷 추가 + 1,200원",
-          "optionPrice": 1200,
-          "optionAvailable": true
-        }
-      ]
-    },
-    {
-      "categoryName": "당도 선택(BIG)",
-      "categoryDescription": "당도 선택(BIG)",
-      "categoryOrder": 3,
-      "options": [
-        {
-          "optionName": "바닐라시럽추가 (BIG)+700원",
-          "optionPrice": 700,
-          "optionAvailable": true
-        },
-        {
-          "optionName": "카라멜시럽추가(BIG) + 700원",
-          "optionPrice": 700,
-          "optionAvailable": true
-        },
-        {
-          "optionName": "헤이즐넛시럽추가 (BIG)+ 700원",
-          "optionPrice": 700,
-          "optionAvailable": true
-        },
-        {
-          "optionName": "라이트바닐라시럽추가 (BIG)+ 1,000",
-          "optionPrice": 1000,
-          "optionAvailable": true
-        },
-        {
-          "optionName": "연유 추가(BIG) + 1,000",
-          "optionPrice": 1000,
-          "optionAvailable": true
-        },
-        {
-          "optionName": "꿀 추가(BIG) + 1,000원",
-          "optionPrice": 1000,
-          "optionAvailable": true
-        },
-        {
-          "optionName": "저당 스테비아 추가(BIG) + 800원",
-          "optionPrice": 800,
-          "optionAvailable": true
-        }
-      ]
-    },
-    {
-      "categoryName": "토핑 선택",
-      "categoryDescription": "토핑 선택",
-      "categoryOrder": 4,
-      "options": [
-        {
-          "optionName": "(품절) 타피오카펄 추가 + 700원",
-          "optionPrice": 700,
-          "optionAvailable": false
-        },
-        {
-          "optionName": "휘핑추가(BIG)+ 700원",
-          "optionPrice": 700,
+          "optionOrder": 0,
           "optionAvailable": true
         }
       ]

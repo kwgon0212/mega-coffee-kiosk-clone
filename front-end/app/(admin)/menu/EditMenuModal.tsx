@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,17 +9,17 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useQuery } from "@tanstack/react-query";
 
-interface AddMenuModalProps {
-  visible: boolean;
-  onClose: () => void;
-}
-
-interface MenuFormData {
+interface Menu {
+  itemId: number;
   itemName: string;
+  itemCategory: string;
+  itemSubCategory: string;
   itemPictureUrl: string;
-  itemMenuDetail: string;
   itemPrice: number;
+  itemSoldout: boolean;
+  itemMenuDetail: string;
   itemMakeTime: number;
   detail: {
     detailKcal: number;
@@ -44,12 +44,28 @@ interface MenuFormData {
   }[];
 }
 
-const AddMenuModal: React.FC<AddMenuModalProps> = ({ visible, onClose }) => {
-  const [formData, setFormData] = useState<MenuFormData>({
+interface EditMenuModalProps {
+  visible: boolean;
+  onClose: () => void;
+  menu: Menu | null;
+  onSave: (updatedMenu: Menu) => void;
+}
+
+const EditMenuModal: React.FC<EditMenuModalProps> = ({
+  visible,
+  onClose,
+  menu,
+  onSave,
+}) => {
+  const [formData, setFormData] = useState<Menu>({
+    itemId: 0,
     itemName: "",
+    itemCategory: "",
+    itemSubCategory: "",
     itemPictureUrl: "",
-    itemMenuDetail: "",
     itemPrice: 0,
+    itemSoldout: false,
+    itemMenuDetail: "",
     itemMakeTime: 0,
     detail: {
       detailKcal: 0,
@@ -63,6 +79,42 @@ const AddMenuModal: React.FC<AddMenuModalProps> = ({ visible, onClose }) => {
     },
     optionCategories: [],
   });
+
+  const { data: menuDetail } = useQuery({
+    queryKey: ["menuDetail", menu?.itemId],
+    queryFn: async () => {
+      if (!menu?.itemId) return null;
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_BASE_URL}/api/menus/item/${menu.itemId}`
+      );
+      return response.json();
+    },
+    enabled: !!menu?.itemId,
+  });
+
+  useEffect(() => {
+    if (menuDetail) {
+      setFormData({
+        ...menu,
+        ...menuDetail,
+        detail: menuDetail.detail || {
+          detailKcal: 0,
+          detailNa: 0,
+          detailGain: 0,
+          detailSugar: 0,
+          detailSatfat: 0,
+          detailTransfat: 0,
+          detailProtein: 0,
+          detailCaffeine: 0,
+        },
+        optionCategories: menuDetail.optionCategories || [],
+      });
+    }
+  }, [menuDetail, menu]);
+
+  if (!menu) {
+    return null;
+  }
 
   const addOptionCategory = () => {
     setFormData({
@@ -102,11 +154,16 @@ const AddMenuModal: React.FC<AddMenuModalProps> = ({ visible, onClose }) => {
     setFormData({ ...formData, optionCategories: newCategories });
   };
 
+  const handleSave = () => {
+    onSave(formData);
+    onClose();
+  };
+
   return (
     <Modal visible={visible} animationType="slide" transparent>
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-          <Text style={styles.title}>새 메뉴 추가</Text>
+          <Text style={styles.title}>메뉴 수정</Text>
           <ScrollView
             style={styles.formContainer}
             showsVerticalScrollIndicator={false}
@@ -156,9 +213,9 @@ const AddMenuModal: React.FC<AddMenuModalProps> = ({ visible, onClose }) => {
               style={styles.input}
               placeholder="제조 시간(분)을 입력하세요"
               keyboardType="numeric"
-              value={formData.itemMakeTime.toString()}
+              value={formData.itemMakeTime?.toString() || "0"}
               onChangeText={(text) =>
-                setFormData({ ...formData, itemMakeTime: Number(text) })
+                setFormData({ ...formData, itemMakeTime: Number(text) || 0 })
               }
             />
 
@@ -413,13 +470,10 @@ const AddMenuModal: React.FC<AddMenuModalProps> = ({ visible, onClose }) => {
               <Text style={styles.buttonText}>취소</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.button, styles.submitButton]}
-              onPress={() => {
-                // TODO: API 호출 구현
-                onClose();
-              }}
+              style={[styles.button, styles.saveButton]}
+              onPress={handleSave}
             >
-              <Text style={styles.submitButtonText}>추가</Text>
+              <Text style={styles.saveButtonText}>저장</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -469,6 +523,12 @@ const styles = StyleSheet.create({
     height: 100,
     textAlignVertical: "top",
   },
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 8,
+    color: "#333",
+  },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -483,26 +543,20 @@ const styles = StyleSheet.create({
   cancelButton: {
     backgroundColor: "#e8e4e0",
   },
-  submitButton: {
+  saveButton: {
     backgroundColor: "#452613",
+  },
+  saveButtonText: {
+    color: "white",
+    textAlign: "center",
+    fontSize: 16,
+    fontWeight: "600",
   },
   buttonText: {
     color: "#333",
     textAlign: "center",
     fontSize: 16,
     fontWeight: "600",
-  },
-  submitButtonText: {
-    color: "white",
-    textAlign: "center",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  inputLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 8,
-    color: "#333",
   },
   nutritionContainer: {
     flexDirection: "row",
@@ -570,4 +624,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddMenuModal;
+export default EditMenuModal;

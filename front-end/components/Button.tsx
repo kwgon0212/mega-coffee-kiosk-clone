@@ -9,7 +9,8 @@ import {
 } from "react-native";
 
 interface ButtonProps {
-  text: string;
+  text?: string;
+  title?: string;
   onPress?: () => void;
   backgroundColor?: string;
   color?: string;
@@ -19,6 +20,7 @@ interface ButtonProps {
 
 const Button = ({
   text,
+  title,
   onPress,
   backgroundColor = "#FFD700",
   color = "#8B4513",
@@ -30,7 +32,7 @@ const Button = ({
       style={[styles.button, { backgroundColor, width }, style]}
       onPress={onPress}
     >
-      <Text style={[styles.buttonText, { color }]}>{text}</Text>
+      <Text style={[styles.buttonText, { color }]}>{title || text}</Text>
     </Pressable>
   );
 };
