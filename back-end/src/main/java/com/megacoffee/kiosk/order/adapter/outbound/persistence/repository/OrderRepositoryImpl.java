@@ -62,11 +62,4 @@ public class OrderRepositoryImpl implements OrderRepository {
         return maxNum == null ? 1 : maxNum + 1;
     }
 
-    @Override
-    @Transactional
-    public OrderEntity updateState(UUID orderId, OrderStatus newStatus) {
-        OrderEntity orderEntity = findById(orderId);
-        orderEntity.changeOrderStatus(newStatus);
-        return orderEntity;
-    }
 }

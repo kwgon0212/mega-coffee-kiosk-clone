@@ -14,5 +14,4 @@ public interface OrderRepository {
     public List<OrderEntity> findAll();
     public List<OrderEntity> findAll(UUID memberId);
     public int findMaxOrderNumber(LocalDateTime start, LocalDateTime end);
-    public OrderEntity updateState(UUID orderId, OrderStatus newStatus);
 }

@@ -94,7 +94,7 @@ public class OrderController {
 
     //== 특정 주문 상태 업데이트 ==//
     @Operation(summary = "주문 상태 업데이트" , description = "관리자가 주문 상태를 업데이트합니다.")
-    @GetMapping("/admin/{orderId}")
+    @PutMapping("/admin/{orderId}")
     public ResponseEntity<?> updateOrderStatus( @PathVariable UUID orderId, @RequestParam String status) {
         // 주문 상태 업데이트
         OrderStatus newStatus = OrderStatus.valueOf(status.toUpperCase());

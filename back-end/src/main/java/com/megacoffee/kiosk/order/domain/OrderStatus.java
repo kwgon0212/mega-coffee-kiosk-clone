@@ -3,6 +3,6 @@ package com.megacoffee.kiosk.order.domain;
 public enum OrderStatus {
     CONFIRMED, // 주문 확인
     COMPLETED, // 주문 완료
-    RREPAIRING, // 주문 제작 중
+    RREPARING, // 주문 제작 중
     PAYMENT_DONE, // 결제 완료
 }

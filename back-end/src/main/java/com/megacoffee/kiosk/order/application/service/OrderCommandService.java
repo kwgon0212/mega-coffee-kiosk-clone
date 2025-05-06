@@ -46,8 +46,10 @@ public class OrderCommandService implements CreateOrderUseCase {
     }
 
     //== 주문 상태 변경 ==//
-    public void changeOrderStatus(UUID userId, OrderStatus orderStatus) {
-        orderRepository.updateState(userId, orderStatus);
+    @Transactional
+    public void changeOrderStatus(UUID orderId, OrderStatus orderStatus) {
+        OrderEntity orderEntity = orderRepository.findById(orderId);
+        orderEntity.changeOrderStatus(orderStatus);
     }
 
 }
