@@ -17,39 +17,49 @@ export default function Login() {
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-    if (!account || !password) {
-      Alert.alert("아이디와 비밀번호를 입력해주세요.");
-      return;
-    }
-    const response = await fetch(
-      `${process.env.EXPO_PUBLIC_BASE_URL}/api/auth/login`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ account, password, provider: "LOCAL" }),
+    try {
+      if (!account || !password) {
+        Alert.alert("아이디와 비밀번호를 입력해주세요.");
+        return;
       }
-    );
 
-    const data = await response.json();
-    console.log(JSON.stringify(data, null, 2));
-
-    if (!response.ok) {
-      Alert.alert(
-        data.error ||
-          data.message ||
-          "아이디 또는 비밀번호가 일치하지 않습니다."
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_BASE_URL}/api/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ account, password }),
+        }
       );
-      return;
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        Alert.alert(
+          data.error ||
+            data.message ||
+            "아이디 또는 비밀번호가 일치하지 않습니다."
+        );
+        return;
+      }
+
+      if (typeof data.accessToken === "string") {
+        await SecureStore.setItemAsync("accessToken", data.accessToken);
+
+        if (data.refreshToken && typeof data.refreshToken === "string") {
+          await SecureStore.setItemAsync("refreshToken", data.refreshToken);
+        }
+      } else {
+        throw new Error("토큰이 올바른 형식이 아닙니다.");
+      }
+
+      await AsyncStorage.setItem("userInfo", JSON.stringify(data.userInfo));
+      router.replace("/(store)");
+    } catch (error) {
+      Alert.alert("오류", "아이디 또는 비밀번호가 일치하지 않습니다.");
     }
-
-    await SecureStore.setItemAsync("accessToken", data.accessToken);
-    await SecureStore.setItemAsync("refreshToken", data.refreshToken);
-
-    await AsyncStorage.setItem("userInfo", JSON.stringify(data.userInfo));
-
-    router.replace("/(store)");
   };
   return (
     <View style={styles.container}>

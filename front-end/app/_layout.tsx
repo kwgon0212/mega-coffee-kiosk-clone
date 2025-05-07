@@ -26,18 +26,10 @@ export default function RootLayout() {
   });
 
   const queryClient = new QueryClient();
-  // const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const segments = useSegments();
 
   const path = usePathname();
-
-  // useEffect(() => {
-  //   const clearAsyncStorage = async () => {
-  //     await SecureStore.deleteItemAsync("accessToken");
-  //   };
-  //   clearAsyncStorage();
-  // }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -58,7 +50,7 @@ export default function RootLayout() {
         // 메뉴  segments ["(menu)", "[store]"]
         // 메뉴상세  segments ["(menu)", "[store]", "[menuId]"]
 
-        if (!accessToken) {
+        if (!accessToken || !userInfo) {
           // if (path === "signup") return;
           // if (path !== "/") router.replace("/");
           return;

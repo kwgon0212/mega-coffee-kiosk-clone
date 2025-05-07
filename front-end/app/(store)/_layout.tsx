@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import SearchButton from "@/components/SearchButton";
 import { View } from "react-native";
 import OrderListButton from "@/components/OrderListButton";
+import LogoutButton from "@/components/LogoutButton";
 
 export default function StoreLayout() {
   return (
@@ -16,11 +17,7 @@ export default function StoreLayout() {
               borderBottomWidth={0}
               rightNode={
                 <View style={{ flexDirection: "row", gap: 10 }}>
-                  <SearchButton
-                    onPress={() => {
-                      console.log("search store");
-                    }}
-                  />
+                  <LogoutButton />
                   <OrderListButton
                     onPress={() => {
                       router.push("/(order)/list");
